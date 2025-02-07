@@ -1,8 +1,5 @@
-from collections import Counter
-from node import Node
-import sys
-from typing import List
-from huffman import Encoder
+from gui import GUI
 
 if __name__ == "__main__":
-    print("gello")
+    gui = GUI()
+    gui.run()

@@ -1,20 +1,33 @@
 from collections import Counter
 from node import Node
+import string
 
 class Huffman:
+    """
+    """
 
-    root = None
-    char_to_bin_index = {}
-    bin_to_char_index = {}
-
-    def __init__(self, text:str) -> None:
-        self.set_huffman(text)
+    def __init__(self, text:str=None) -> None:
+        """
+        """
+        self.char_to_bin_index = None
+        self.bin_to_char_index = None
+        if text is not None:
+            self.set_huffman(text=text)
 
     @staticmethod
     def bit_to_byte(bin_string: str) -> bytes:
-        """
-        Converts a string type variable that contains a sequence of bits into a list type variable that contains the
+        """ Converts a string type variable that contains a sequence of bits into a bytes type variable that contains the
         corresponding byte representation.
+
+        Parameters
+        ----------
+        bin_string : str
+            Binary string to be converted into the bytes data type.
+
+        Returns
+        -------
+        bytes
+            The bytes representation of the binary string.
         """
 
         if len(bin_string) % 8 != 0:
@@ -25,14 +38,22 @@ class Huffman:
             chunk = bin_string[chunk_position:chunk_position+8]
             byte_content.append(int(chunk, 2)) # Converting the chunk into base 2 integer.
 
-
         return bytes(byte_content)
 
     @staticmethod
     def byte_to_bit(byte_content: bytes) -> str:
-        """
-        Converts a list type variable that contains a sequence of bytes into a string type variable that contains the
+        """ Converts a list type variable that contains a sequence of bytes into a string type variable that contains the
         corresponding bit representation.
+
+        Parameters
+        ----------
+        byte_content : bytes
+            Bytes content to convert into a binary string.
+
+        Returns
+        -------
+        str
+            A binary value as a string.
         """
 
         bin_string = bin(int.from_bytes(byte_content, 'big'))[2:]
@@ -41,7 +62,7 @@ class Huffman:
         return bin_string
     
     @staticmethod
-    def get_char_percentages(text:str) -> dict:
+    def get_char_percentages(text:str, fill:bool=False) -> dict:
         """Calculates the percentage of appearance of each character in the given text file. 
 
         Parameters
@@ -56,18 +77,24 @@ class Huffman:
         """
 
         # Get all necessary preliminary values:
-        total_char_number: int = len(text)
+        total_char_number = len(text)
         char_counter = dict(Counter(text))
 
-        # Compute percentages:
+        # Compute percentages on the input text characters:
         percentage_dict: dict = {}
         for char in char_counter:
             percentage_dict[char] = (char_counter[char] / total_char_number) * 100
-
+            
+        if fill:
+            # Add other non-encountered ASCII characters.
+            for char in string.printable:
+                if char not in percentage_dict.keys():
+                    percentage_dict[char] = 0.0
+        
         # Return the percentage dictionnary sorted in ascending order:
         return dict(sorted(percentage_dict.items(), key=lambda x: x[1]))
 
-    def set_huffman(self, text:str) -> Node:
+    def set_huffman(self, text:str) -> None:
         """Computes the Huffman tree data structure. For more details on the logic behind the Huffman tree, see: https://en.wikipedia.org/wiki/Huffman_coding   
 
         Parameters
@@ -77,16 +104,11 @@ class Huffman:
 
         Returns
         -------
-        Node
-            The root node for the generated Huffman tree.
-        dict
-            A dictionnary representing the character-to-binary index corresponding to the generated Huffman tree. 
-            Each unique character is a key, and its corresponding binary representation for the generated huffman tree 
-            is the value associated to the key.
+        None
         """
 
         # Huffman Tree: 
-        char_percentages = Huffman.get_char_percentages(text)
+        char_percentages = Huffman.get_char_percentages(text, fill=True)
         nodes = list([Node(character=char, probability=char_percentages[char]) for char in char_percentages])
 
         while len(nodes) > 1:
@@ -96,25 +118,23 @@ class Huffman:
 
         # Character to Binary index:
         self.char_to_bin_index = {}
-        for char in text:
 
+        for char in string.printable:
             if char not in self.char_to_bin_index:
-                new_char_to_bin = ''
+                char_to_bin = ''
                 current_node = self.root
-
+                # As long as base leaf not reached:
                 while len(current_node.chars) != 1:
+                    # Follow tree down and add binary path.
                     if char in current_node.first_child_node.chars:
                         current_node = current_node.first_child_node
-                        new_char_to_bin += str(current_node.binary_id)
+                        char_to_bin += str(current_node.binary_id)
                     else:
                         current_node = current_node.second_child_node
-                        new_char_to_bin += str(current_node.binary_id)
-                self.char_to_bin_index[char] = new_char_to_bin
-        
-        self.char_to_bin_index = self.char_to_bin_index
+                        char_to_bin += str(current_node.binary_id)
+                self.char_to_bin_index[char] = char_to_bin
+    
         self.bin_to_char_index = {binary: char for char, binary in self.char_to_bin_index.items()}
-
-        return self.root
 
     def encode(self, text:str) -> bytearray:
         """Encodes the given text file into a byte array following the Huffman Encoding method. For more details on the Huffman Encoding method, see: https://en.wikipedia.org/wiki/Huffman_coding
@@ -167,4 +187,5 @@ class Huffman:
             right += 1
         
         return text
+    
     
