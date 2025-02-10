@@ -4,3 +4,33 @@ Traceback (most recent call last):
     tk.Button(stats_window, text="Close", command=stats_window.destroy).grid(row=row+1, column=0, padx=10, pady=10)
                                                                                  ^^^
 UnboundLocalError: cannot access local variable 'row' where it is not associated with a value
+2025-02-10 15:21:21,514 - ERROR - name 'row' is not defined
+Traceback (most recent call last):
+  File "D:\Huffman-Encoding\gui.py", line 193, in encoding_stats
+    tk.Button(stats_window, text="Close", command=stats_window.destroy).grid(row=row+1, column=0, padx=10, pady=10)
+                                                                                 ^^^
+NameError: name 'row' is not defined. Did you mean: 'pow'?
+2025-02-10 15:21:53,993 - ERROR - Uncaught Exception
+Traceback (most recent call last):
+  File "D:\Huffman-Encoding\main.py", line 5, in <module>
+    gui.run()
+  File "D:\Huffman-Encoding\gui.py", line 489, in run
+    self.root.mainloop()
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.12_3.12.2544.0_x64__qbz5n2kfra8p0\Lib\tkinter\__init__.py", line 1505, in mainloop
+    self.tk.mainloop(n)
+KeyboardInterrupt
+2025-02-10 15:46:53,980 - ERROR - 'GUI' object has no attribute 'details_label'
+Traceback (most recent call last):
+  File "D:\Huffman-Encoding\gui.py", line 204, in encoding_stats
+    self.details_label.pack(pady=10, anchor="w")
+    ^^^^^^^^^^^^^^^^^^
+AttributeError: 'GUI' object has no attribute 'details_label'
+2025-02-10 15:53:58,638 - ERROR - Uncaught Exception
+Traceback (most recent call last):
+  File "D:\Huffman-Encoding\main.py", line 5, in <module>
+    gui.run()
+  File "D:\Huffman-Encoding\gui.py", line 515, in run
+    self.root.mainloop()
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.12_3.12.2544.0_x64__qbz5n2kfra8p0\Lib\tkinter\__init__.py", line 1505, in mainloop
+    self.tk.mainloop(n)
+KeyboardInterrupt
