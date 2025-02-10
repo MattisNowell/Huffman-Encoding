@@ -17,6 +17,14 @@ class GUI():
         self.notebook = ttk.Notebook(self.root)
         self.notebook.pack(expand=True, fill='both')
 
+        self.save_name = tk.StringVar()
+        self.save_name.set("None")
+
+        try:
+            self.load_save("default.json")
+        except Exception as e:
+            pass
+
         logging.basicConfig(
             filename="error.log",
             level=logging.ERROR,
@@ -81,27 +89,29 @@ class GUI():
             compression_tab = ttk.Frame(self.notebook)
             self.notebook.add(compression_tab, text="Compress")
 
+            tk.Label(compression_tab, textvariable=self.save_name).grid(row=0, column=0, padx=10, pady=10)
+
             # COMPRESSION TITLE
-            tk.Label(compression_tab, text="Compress").grid(row=0, column=0, padx=10, pady=10)
+            tk.Label(compression_tab, text="Compress").grid(row=1, column=0, padx=10, pady=10)
 
             # COMPRESSION FILE ENTRY AND BROWSER 
             self.compression_file_path = tk.StringVar()
             entry = tk.Entry(compression_tab, textvariable=self.compression_file_path, width=50)
-            entry.grid(row=1, column=0, padx=10, pady=10)
+            entry.grid(row=2, column=0, padx=10, pady=10)
             entry.config(state="readonly")
 
-            tk.Button(compression_tab, text="Select File", command=lambda: self.browse_files(self.compression_file_path, [("Text Files", "*.txt")], "Select File")).grid(row=2, column=0, padx=10, pady=10)
+            tk.Button(compression_tab, text="Select File", command=lambda: self.browse_files(self.compression_file_path, [("Text Files", "*.txt")], "Select File")).grid(row=3, column=0, padx=10, pady=10)
 
             # COMPRESSION FOLDER ENTRY AND BROWSER 
             self.compression_target_path = tk.StringVar()
             entry = tk.Entry(compression_tab, textvariable=self.compression_target_path, width=50)
-            entry.grid(row=3, column=0, padx=10, pady=10)
+            entry.grid(row=4, column=0, padx=10, pady=10)
             entry.config(state="readonly")
 
-            tk.Button(compression_tab, text="Select Target Directory", command=lambda: self.browse_directories(self.compression_target_path, "Select Folder")).grid(row=4, column=0, padx=10, pady=10)
+            tk.Button(compression_tab, text="Select Target Directory", command=lambda: self.browse_directories(self.compression_target_path, "Select Folder")).grid(row=5, column=0, padx=10, pady=10)
 
             # COMPRESS
-            tk.Button(compression_tab, text="Compress", command=self.compress).grid(row=6, column=0, padx=10, pady=10)
+            tk.Button(compression_tab, text="Compress", command=self.compress).grid(row=7, column=0, padx=10, pady=10)
 
         except Exception as e:
             messagebox.showerror("Error", "An UI error occured. Please log files for details.")
@@ -120,27 +130,29 @@ class GUI():
             extraction_tab = ttk.Frame(self.notebook)     
             self.notebook.add(extraction_tab, text="Extract")
 
+            tk.Label(extraction_tab, textvariable=self.save_name).grid(row=0, column=0, padx=10, pady=10)
+
             # EXTRACTION TITLE
-            tk.Label(extraction_tab, text="Extract").grid(row=0, column=1, padx=10, pady=10)
+            tk.Label(extraction_tab, text="Extract").grid(row=1, column=1, padx=10, pady=10)
 
             # EXTRACTION FILE ENTRY AND BROWSER
             self.extraction_file_path = tk.StringVar()
             entry = tk.Entry(extraction_tab, textvariable=self.extraction_file_path, width=50)
-            entry.grid(row=1, column=1, padx=10, pady=10)
+            entry.grid(row=2, column=1, padx=10, pady=10)
             entry.config(state="readonly")
 
-            tk.Button(extraction_tab, text="Select File", command=lambda: self.browse_files(self.extraction_file_path, [("Binary Files", "*.bin")], "Select File")).grid(row=2, column=1, padx=10, pady=10)
+            tk.Button(extraction_tab, text="Select File", command=lambda: self.browse_files(self.extraction_file_path, [("Binary Files", "*.bin")], "Select File")).grid(row=3, column=1, padx=10, pady=10)
 
             # EXTRACTION TARGET FOLDER ENTRY AND BROWSER
             self.extraction_target_path = tk.StringVar()
             entry = tk.Entry(extraction_tab, textvariable=self.extraction_target_path, width=50)
-            entry.grid(row=3, column=1, padx=10, pady=10)
+            entry.grid(row=4, column=1, padx=10, pady=10)
             entry.config(state="disabled")
 
-            tk.Button(extraction_tab, text="Select Target Directory", command=lambda: self.browse_directories(self.extraction_target_path, "Select Folder")).grid(row=4, column=1, padx=10, pady=10)
+            tk.Button(extraction_tab, text="Select Target Directory", command=lambda: self.browse_directories(self.extraction_target_path, "Select Folder")).grid(row=5, column=1, padx=10, pady=10)
 
             # EXTRACT
-            tk.Button(extraction_tab, text="Extract", command=self.extract).grid(row=6, column=1, padx=10, pady=10)
+            tk.Button(extraction_tab, text="Extract", command=self.extract).grid(row=7, column=1, padx=10, pady=10)
 
         except Exception as e:
             messagebox.showerror("Error", "The UI error occured. Please see log files for details.")
@@ -185,7 +197,7 @@ class GUI():
                 # Creating the new window.
                 stats_window = tk.Toplevel(self.root)
                 stats_window.title("Encoding and Statistics")
-                
+
                 left_frame = tk.Frame(stats_window)
                 left_frame.pack(side=tk.LEFT, fill=tk.BOTH, padx=10, pady=10, expand=True)
 
@@ -259,12 +271,14 @@ class GUI():
         try:
             self.browse_files(path, [("Text Files", "*.txt")], "Select File")
         except:
+            logging.error(str(e), exc_info=True)
             return None 
         
         # Generate the new huffman tree.
         try:
             with open(path.get(), 'r') as file:
                 self.encoder.set_huffman(file.read())
+                self.save_name.set("untitled.json")
                 messagebox.showinfo("Success", "A new huffman encoding was successfully generated.")
         except Exception as e:
             messagebox.showerror("Error", "An error occurred with the selected file.")
@@ -284,6 +298,7 @@ class GUI():
         try:
             self.browse_files(path, [("JSON File", "*.json")], "Open File")
         except Exception as e:
+            logging.error(str(e), exc_info=True)
             return None
 
         # Load the save into the encoder.
@@ -307,8 +322,9 @@ class GUI():
         # Ask the user for the directory in which to save the huffman tree json file.
         
         try:
-            self.save_file(path=path, title="Save File As", defaultextension=".json", filetypes=[("JSON Files", "*.json")])
+            self.save_file(path=path, title="Save File As", defaultextension=".json", filetype=[("JSON Files", "*.json")])
         except Exception as e:
+            logging.error(str(e), exc_info=True)
             return None 
         
         # Save the huffman encoding in the directory as a json file.
@@ -367,7 +383,7 @@ class GUI():
         """
 
         try:
-            file_path = filedialog.asksaveasfilename(title=title, defaultextension=".json", filetypes=filetype)
+            file_path = filedialog.asksaveasfilename(title=title, defaultextension=".json", initialfile="untitled.json", filetypes=filetype)
             if file_path:
                 path.set(file_path)
         except Exception as e:
@@ -480,12 +496,13 @@ class GUI():
         # Saving the Huffman parameters in a file.
         try:
             with open(path, "w") as json_file:
-                data = [self.encoder.char_to_bin_index, self.encoder.bin_to_char_index]
+                data = [os.path.basename(path), self.encoder.char_to_bin_index, self.encoder.bin_to_char_index, self.encoder.char_percentages]
                 json.dump(data, json_file, indent=4)
+                self.save_name.set(data[0])
         except Exception as e:
             raise
     
-    def load_save(self, path:str):
+    def load_save(self, path:str) -> None:
         """ Loads existing huffman tree parameters from a specified JSON file.
 
         Parameters
@@ -502,8 +519,9 @@ class GUI():
         try:
             if os.path.exists(path):
                 with open(path, 'r') as json_file:
-                    data = json.load(json_file) 
-                    self.encoder.char_to_bin_index, self.encoder.bin_to_char_index = data[0], data[1]
+                    data = json.load(json_file)
+                    self.save_name.set(data[0])
+                    self.encoder.char_to_bin_index, self.encoder.bin_to_char_index, self.encoder.char_percentages = data[1], data[2], data[3]
             else:
                 return None
         except Exception as e:
