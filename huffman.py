@@ -3,12 +3,10 @@ from node import Node
 import string
 
 class Huffman:
-    """
+    """ 
     """
 
     def __init__(self, text:str=None) -> None:
-        """
-        """
         self.char_to_bin_index = None
         self.bin_to_char_index = None
         if text is not None:
