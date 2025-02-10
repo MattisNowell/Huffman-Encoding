@@ -177,8 +177,89 @@ class GUI():
             messagebox.showerror("Error", "An UI error occured. Please see log files for details.")
             logging.error(str(e), exc_info=True)
 
-    
-    # ***** TOP_MENU ACTIONS *****
+
+    # ***** ENCODING MENU ACTIONS *****
+
+    def new_huffman_encoder(self) -> None:
+        """ Generates a new huffman tree and a new corresponding binary encoding for future compressions and extractions.
+        
+        Returns
+        -------
+        None
+        """
+
+        path = tk.StringVar()
+
+        # Ask the user for a text file from which generate the new huffman tree.
+        try:
+            self.browse_files(path, [("Text Files", "*.txt")], "Select File")
+        except:
+            logging.error(str(e), exc_info=True)
+            return None 
+        
+        # Generate the new huffman tree.
+        try:
+            with open(path.get(), 'r') as file:
+                self.encoder.set_huffman(file.read())
+                self.save_name.set("untitled.json")
+                messagebox.showinfo("Success", "A new huffman encoding was successfully generated.")
+        except Exception as e:
+            messagebox.showerror("Error", "An error occurred with the selected file.")
+            logging.error(str(e), exc_info=True)
+
+    def open_huffman_encoder(self) -> None:
+        """ 
+        
+        Returns
+        -------
+        None
+        """
+
+        path = tk.StringVar()
+
+        # Ask the user for the huffman tree json save.
+        try:
+            self.browse_files(path, [("JSON File", "*.json")], "Open File")
+        except Exception as e:
+            logging.error(str(e), exc_info=True)
+            return None
+
+        # Load the save into the encoder.
+        try:
+            self.load_save(path.get())
+            messagebox.showinfo("Success", "The huffman encoding was successfully loaded.")
+        except Exception as e:
+            messagebox.showerror(title="Error", message="The huffman encoding failed to load.")
+            logging.error(str(e), exc_info=True)
+
+    def save_huffman_encoder(self) -> None:
+        """ Saves the currently loaded huffman encoding to the target path.
+        
+        Returns
+        -------
+        None
+        """
+        
+        path = tk.StringVar()
+
+        # Ask the user for the directory in which to save the huffman tree json file.
+        
+        try:
+            self.browse_save_files(path=path, title="Save File As", defaultextension=".json", filetype=[("JSON Files", "*.json")])
+        except Exception as e:
+            logging.error(str(e), exc_info=True)
+            return None 
+        
+        # Save the huffman encoding in the directory as a json file.
+        try:
+            self.create_save(path.get())
+            messagebox.showinfo("Success", "The current huffman encoding was successfully saved.")
+        except Exception as e:
+            messagebox.showerror("Error", "The current huffman encoding failed to save.")
+            logging.error(str(e), exc_info=True)
+
+
+    # ***** SETTINGS MENU ACTIONS *****
 
     def encoding_stats(self) -> None:
         """ Creates a new window with the current huffman tree's statistics and binary encoding information. 
@@ -257,86 +338,8 @@ class GUI():
             messagebox.showerror("Error", "An UI error occured. Please see log files for more details.")
             logging.error(str(e), exc_info=True)
 
-    def new_huffman_encoder(self) -> None:
-        """ Generates a new huffman tree and a new corresponding binary encoding for future compressions and extractions.
-        
-        Returns
-        -------
-        None
-        """
-
-        path = tk.StringVar()
-
-        # Ask the user for a text file from which generate the new huffman tree.
-        try:
-            self.browse_files(path, [("Text Files", "*.txt")], "Select File")
-        except:
-            logging.error(str(e), exc_info=True)
-            return None 
-        
-        # Generate the new huffman tree.
-        try:
-            with open(path.get(), 'r') as file:
-                self.encoder.set_huffman(file.read())
-                self.save_name.set("untitled.json")
-                messagebox.showinfo("Success", "A new huffman encoding was successfully generated.")
-        except Exception as e:
-            messagebox.showerror("Error", "An error occurred with the selected file.")
-            logging.error(str(e), exc_info=True)
-
-    def open_huffman_encoder(self) -> None:
-        """ 
-        
-        Returns
-        -------
-        None
-        """
-
-        path = tk.StringVar()
-
-        # Ask the user for the huffman tree json save.
-        try:
-            self.browse_files(path, [("JSON File", "*.json")], "Open File")
-        except Exception as e:
-            logging.error(str(e), exc_info=True)
-            return None
-
-        # Load the save into the encoder.
-        try:
-            self.load_save(path.get())
-            messagebox.showinfo("Success", "The huffman encoding was successfully loaded.")
-        except Exception as e:
-            messagebox.showerror(title="Error", message="The huffman encoding failed to load.")
-            logging.error(str(e), exc_info=True)
-
-    def save_huffman_encoder(self) -> None:
-        """ Saves the currently loaded huffman encoding to the target path.
-        
-        Returns
-        -------
-        None
-        """
-        
-        path = tk.StringVar()
-
-        # Ask the user for the directory in which to save the huffman tree json file.
-        
-        try:
-            self.save_file(path=path, title="Save File As", defaultextension=".json", filetype=[("JSON Files", "*.json")])
-        except Exception as e:
-            logging.error(str(e), exc_info=True)
-            return None 
-        
-        # Save the huffman encoding in the directory as a json file.
-        try:
-            self.create_save(path.get())
-            messagebox.showinfo("Success", "The current huffman encoding was successfully saved.")
-        except Exception as e:
-            messagebox.showerror("Error", "The current huffman encoding failed to save.")
-            logging.error(str(e), exc_info=True)
-
     
-    # ***** COMPRESSION_MENU ACTIONS *****
+    # ***** FILE EXPLORER BROWSING ACTIONS *****
 
     def browse_files(self, path:tk.StringVar, filetype:list, title:str='') -> None:
         """ Get an input from the user to select a file.
@@ -365,7 +368,7 @@ class GUI():
             raise 
 
     
-    def save_file(self, path:tk.StringVar, filetype:list, defaultextension:str=".json", title:str='') -> None:
+    def browse_save_files(self, path:tk.StringVar, filetype:list, defaultextension:str=".json", title:str='') -> None:
         """ Get an input from the user to select a file.
 
         Parameters
@@ -414,6 +417,60 @@ class GUI():
             messagebox.showerror("Error", "The file operation failed. Please see log files for more details.")
             logging.error(str(e), exc_info=True)
             raise
+        
+
+    # ***** FILE SAVE AND LOAD FUNCTIONS *****
+
+    def create_save(self, path:str):
+        """ Saves the object's huffman tree parameters from a specified JSON file.
+
+        Parameters
+        ----------
+        path : str
+            Text string to represents a path to the file to save the JSON Huffman tree parameters into.
+       
+        Returns
+        -------
+        str
+            An error message.
+        """
+
+        # Saving the Huffman parameters in a file.
+        try:
+            with open(path, "w") as json_file:
+                data = [os.path.basename(path), self.encoder.char_to_bin_index, self.encoder.bin_to_char_index, self.encoder.char_percentages]
+                json.dump(data, json_file, indent=4)
+                self.save_name.set(data[0])
+        except Exception as e:
+            raise
+    
+    def load_save(self, path:str) -> None:
+        """ Loads existing huffman tree parameters from a specified JSON file.
+
+        Parameters
+        ----------
+        path : str
+            Text string to represents a path to the file to load the JSON Huffman tree parameters from.
+       
+        Returns
+        -------
+        str
+            An error message.
+        """
+
+        try:
+            if os.path.exists(path):
+                with open(path, 'r') as json_file:
+                    data = json.load(json_file)
+                    self.save_name.set(data[0])
+                    self.encoder.char_to_bin_index, self.encoder.bin_to_char_index, self.encoder.char_percentages = data[1], data[2], data[3]
+            else:
+                return None
+        except Exception as e:
+            raise
+
+
+    # ***** COMPRESS AND EXTRACT ACTIONS *****
 
     def compress(self) -> None:
         """ Gets the file to compress and compresses it to the directory file. 
@@ -479,53 +536,6 @@ class GUI():
                 logging.error(str(e), exc_info=True)
         return None
     
-    def create_save(self, path:str):
-        """ Saves the object's huffman tree parameters from a specified JSON file.
-
-        Parameters
-        ----------
-        path : str
-            Text string to represents a path to the file to save the JSON Huffman tree parameters into.
-       
-        Returns
-        -------
-        str
-            An error message.
-        """
-
-        # Saving the Huffman parameters in a file.
-        try:
-            with open(path, "w") as json_file:
-                data = [os.path.basename(path), self.encoder.char_to_bin_index, self.encoder.bin_to_char_index, self.encoder.char_percentages]
-                json.dump(data, json_file, indent=4)
-                self.save_name.set(data[0])
-        except Exception as e:
-            raise
-    
-    def load_save(self, path:str) -> None:
-        """ Loads existing huffman tree parameters from a specified JSON file.
-
-        Parameters
-        ----------
-        path : str
-            Text string to represents a path to the file to load the JSON Huffman tree parameters from.
-       
-        Returns
-        -------
-        str
-            An error message.
-        """
-
-        try:
-            if os.path.exists(path):
-                with open(path, 'r') as json_file:
-                    data = json.load(json_file)
-                    self.save_name.set(data[0])
-                    self.encoder.char_to_bin_index, self.encoder.bin_to_char_index, self.encoder.char_percentages = data[1], data[2], data[3]
-            else:
-                return None
-        except Exception as e:
-            raise
 
     # ***** Run *****
 
