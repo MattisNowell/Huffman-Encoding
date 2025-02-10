@@ -106,8 +106,8 @@ class Huffman:
         """
 
         # Huffman Tree: 
-        char_percentages = Huffman.get_char_percentages(text, fill=True)
-        nodes = list([Node(character=char, probability=char_percentages[char]) for char in char_percentages])
+        self.char_percentages = Huffman.get_char_percentages(text, fill=True)
+        nodes = list([Node(character=char, probability=self.char_percentages[char]) for char in self.char_percentages])
 
         while len(nodes) > 1:
             nodes.append(Node(nodes[0], nodes[1]))

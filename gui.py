@@ -177,25 +177,50 @@ class GUI():
         """
         
         try:
-            # Creating the new window.
-            stats_window = tk.Toplevel(self.root)
-            stats_window.title("Encoding and Statistics")
-
             # Displaying the stats and encoding.
             if self.encoder.char_to_bin_index == None:
-                tk.Label(stats_window, text="No encoder detected. Please open or create an encoder to see its details.").grid(row=0, column=0, padx=10, pady=10)
+                messagebox.showinfo("Information", "No encoder detected. Please open or create an encoder to see its details.")
+                return None
             else:    
-                row, column = 0, 0
-                for i in range(len(self.encoder.char_to_bin_index.keys())):
-                    row, column = i%10, i//10
-                    char = list(self.encoder.char_to_bin_index.keys())[i]
-                    val = self.encoder.char_to_bin_index[char]
-                    tk.Label(stats_window, text=f"{char}: {val}").grid(row=row, column=column, padx=10, pady=10)
-            tk.Button(stats_window, text="Close", command=stats_window.destroy).grid(row=row+1, column=0, padx=10, pady=10)
+                # Creating the new window.
+                stats_window = tk.Toplevel(self.root)
+                stats_window.title("Encoding and Statistics")
+                
+                left_frame = tk.Frame(stats_window)
+                left_frame.pack(side=tk.LEFT, fill=tk.BOTH, padx=10, pady=10, expand=True)
+
+                right_frame = tk.Frame(stats_window)
+                right_frame.pack(side=tk.LEFT, fill=tk.BOTH, padx=10, pady=10, expand=True)
+
+                self.listbox = tk.Listbox(left_frame, height=15, selectmode=tk.SINGLE)
+                self.listbox.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+
+                items = [i for i in list(self.encoder.char_to_bin_index.keys())]
+                for i in items:
+                    self.listbox.insert(tk.END, i)
+
+                self.listbox.bind("<<ListboxSelect>>", self.display_character_info)
+
+                self.info = tk.Label(right_frame, text="Select a character to view details", anchor="w", justify="left", wraplength=200)
+                self.info.pack(pady=10, anchor="w")
 
         except Exception as e:
             messagebox.showerror("Error", "An UI error occured. Please see log files for more details.")
             logging.error(str(e), exc_info=True)
+
+    def display_character_info(self, event):
+        """
+        """
+
+        selection = self.listbox.curselection()
+        if not selection:
+            return None
+
+        char = self.listbox.get(selection[0])
+        percentage = self.encoder.char_percentages[char]
+        binary = self.encoder.char_to_bin_index[char]
+
+        self.info.config(text=f"Character: {char}\n Percentage of appearance: {percentage}\nBinary Encoding: {binary}")
 
     def help(self) -> None:
         """ Creates a new window with the "help" information.
