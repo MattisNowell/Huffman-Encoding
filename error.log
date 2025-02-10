@@ -34,3 +34,46 @@ Traceback (most recent call last):
   File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.12_3.12.2544.0_x64__qbz5n2kfra8p0\Lib\tkinter\__init__.py", line 1505, in mainloop
     self.tk.mainloop(n)
 KeyboardInterrupt
+2025-02-10 16:36:13,283 - ERROR - GUI.save_file() got an unexpected keyword argument 'filetypes'
+Traceback (most recent call last):
+  File "D:\Huffman-Encoding\gui.py", line 317, in save_huffman_encoder
+    self.save_file(path=path, title="Save File As", defaultextension=".json", filetypes=[("JSON Files", "*.json")])
+TypeError: GUI.save_file() got an unexpected keyword argument 'filetypes'
+2025-02-10 16:37:05,908 - ERROR - Uncaught Exception
+Traceback (most recent call last):
+  File "D:\Huffman-Encoding\main.py", line 5, in <module>
+    gui.run()
+  File "D:\Huffman-Encoding\gui.py", line 523, in run
+    self.root.mainloop()
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.12_3.12.2544.0_x64__qbz5n2kfra8p0\Lib\tkinter\__init__.py", line 1505, in mainloop
+    self.tk.mainloop(n)
+KeyboardInterrupt
+2025-02-10 17:05:38,351 - ERROR - Uncaught Exception
+Traceback (most recent call last):
+  File "D:\Huffman-Encoding\main.py", line 5, in <module>
+    gui.run()
+  File "D:\Huffman-Encoding\gui.py", line 533, in run
+    self.root.mainloop()
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.12_3.12.2544.0_x64__qbz5n2kfra8p0\Lib\tkinter\__init__.py", line 1505, in mainloop
+    self.tk.mainloop(n)
+KeyboardInterrupt
+2025-02-10 17:07:25,235 - ERROR - [Errno 2] No such file or directory: ''
+Traceback (most recent call last):
+  File "D:\Huffman-Encoding\gui.py", line 279, in new_huffman_encoder
+    with open(path.get(), 'r') as file:
+         ^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: ''
+2025-02-10 17:09:52,240 - ERROR - [Errno 2] No such file or directory: ''
+Traceback (most recent call last):
+  File "D:\Huffman-Encoding\gui.py", line 279, in new_huffman_encoder
+    with open(path.get(), 'r') as file:
+         ^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: ''
+2025-02-10 17:11:39,072 - ERROR - [Errno 2] No such file or directory: ''
+Traceback (most recent call last):
+  File "D:\Huffman-Encoding\gui.py", line 332, in save_huffman_encoder
+    self.create_save(path.get())
+  File "D:\Huffman-Encoding\gui.py", line 498, in create_save
+    with open(path, "w") as json_file:
+         ^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: ''
