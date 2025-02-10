@@ -1,7 +1,7 @@
 import tkinter as tk 
 from tkinter import filedialog, messagebox, ttk
 from huffman import Huffman
-import json, os
+import json, os, logging, sys
 
 
 class GUI():
@@ -17,9 +17,20 @@ class GUI():
         self.notebook = ttk.Notebook(self.root)
         self.notebook.pack(expand=True, fill='both')
 
+        logging.basicConfig(
+            filename="error.log",
+            level=logging.ERROR,
+            format="%(asctime)s - %(levelname)s - %(message)s"
+        )
+
+        sys.excepthook = self.global_error_handler
+
         self.top_menu()
         self.compression_menu()
         self.extraction_menu()
+    
+    def global_error_handler(self, exctype, value, traceback):
+        logging.error("Uncaught Exception", exc_info=(exctype, value, traceback))
 
 
     # ***** MENU DISPLAYS *****
@@ -55,7 +66,7 @@ class GUI():
 
         except Exception as e:
             messagebox.showerror("Error", "An UI error occured. Please see log files for details.")
-            print(str(e))
+            logging.error(str(e), exc_info=True)
     
     def compression_menu(self) -> None:
         """ Sets all the widgets for the compression menu.  
@@ -94,7 +105,7 @@ class GUI():
 
         except Exception as e:
             messagebox.showerror("Error", "An UI error occured. Please log files for details.")
-            print(str(e))
+            logging.error(str(e), exc_info=True)
              
     def extraction_menu(self) -> None:
         """ Sets all the widgets for the extraction menu.  
@@ -133,7 +144,7 @@ class GUI():
 
         except Exception as e:
             messagebox.showerror("Error", "The UI error occured. Please see log files for details.")
-            print(str(e))
+            logging.error(str(e), exc_info=True)
     
     def reset_menus(self) -> None:
         """ Resets all entries in all menus to blank.  
@@ -152,7 +163,7 @@ class GUI():
 
         except Exception as e:
             messagebox.showerror("Error", "An UI error occured. Please see log files for details.")
-            print(str(e))
+            logging.error(str(e), exc_info=True)
 
     
     # ***** TOP_MENU ACTIONS *****
@@ -184,6 +195,7 @@ class GUI():
 
         except Exception as e:
             messagebox.showerror("Error", "An UI error occured. Please see log files for more details.")
+            logging.error(str(e), exc_info=True)
 
     def help(self) -> None:
         """ Creates a new window with the "help" information.
@@ -206,7 +218,7 @@ class GUI():
 
         except Exception as e:
             messagebox.showerror("Error", "An UI error occured. Please see log files for more details.")
-            print(str(e))
+            logging.error(str(e), exc_info=True)
 
     def new_huffman_encoder(self) -> None:
         """ Generates a new huffman tree and a new corresponding binary encoding for future compressions and extractions.
@@ -231,7 +243,7 @@ class GUI():
                 messagebox.showinfo("Success", "A new huffman encoding was successfully generated.")
         except Exception as e:
             messagebox.showerror("Error", "An error occurred with the selected file.")
-            print(e)
+            logging.error(str(e), exc_info=True)
 
     def open_huffman_encoder(self) -> None:
         """ 
@@ -255,7 +267,7 @@ class GUI():
             messagebox.showinfo("Success", "The huffman encoding was successfully loaded.")
         except Exception as e:
             messagebox.showerror(title="Error", message="The huffman encoding failed to load.")
-            print(str(e))
+            logging.error(str(e), exc_info=True)
 
     def save_huffman_encoder(self) -> None:
         """ Saves the currently loaded huffman encoding to the target path.
@@ -280,7 +292,7 @@ class GUI():
             messagebox.showinfo("Success", "The current huffman encoding was successfully saved.")
         except Exception as e:
             messagebox.showerror("Error", "The current huffman encoding failed to save.")
-            print(str(e))
+            logging.error(str(e), exc_info=True)
 
     
     # ***** COMPRESSION_MENU ACTIONS *****
@@ -308,7 +320,7 @@ class GUI():
                 path.set(file_path)
         except Exception as e:
             messagebox.showerror("Error", "The file operation failed. Please see log files for more details.")
-            print(str(e))
+            logging.error(str(e), exc_info=True)
             raise 
 
     
@@ -335,7 +347,7 @@ class GUI():
                 path.set(file_path)
         except Exception as e:
             messagebox.showerror("Error", "The file operation failed. Please see log files for more details.")
-            print(str(e))
+            logging.error(str(e), exc_info=True)
             raise
 
     def browse_directories(self, path:tk.StringVar, title:str='') -> None:
@@ -359,7 +371,7 @@ class GUI():
                 path.set(directory_path)
         except Exception as e:
             messagebox.showerror("Error", "The file operation failed. Please see log files for more details.")
-            print(str(e))
+            logging.error(str(e), exc_info=True)
             raise
 
     def compress(self) -> None:
@@ -392,7 +404,7 @@ class GUI():
                 self.reset_menus()
             except Exception as e:
                 messagebox.showerror("Error", "An error has occured during compression. Please see log file for more details.")
-                print(str(e))
+                logging.error(str(e), exc_info=True)
         return None
         
     def extract(self) -> int: 
@@ -423,7 +435,7 @@ class GUI():
                 self.reset_menus()
             except Exception as e:
                 messagebox.showerror("Error", "An error has occured during extraction. Please see log files for more details.")
-                print(str(e))
+                logging.error(str(e), exc_info=True)
         return None
     
     def create_save(self, path:str):

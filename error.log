@@ -1,0 +1,6 @@
+2025-02-10 15:01:57,506 - ERROR - cannot access local variable 'row' where it is not associated with a value
+Traceback (most recent call last):
+  File "D:\Huffman-Encoding\gui.py", line 194, in encoding_stats
+    tk.Button(stats_window, text="Close", command=stats_window.destroy).grid(row=row+1, column=0, padx=10, pady=10)
+                                                                                 ^^^
+UnboundLocalError: cannot access local variable 'row' where it is not associated with a value
