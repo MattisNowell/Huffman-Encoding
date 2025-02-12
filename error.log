@@ -95,3 +95,45 @@ Traceback (most recent call last):
   File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.12_3.12.2544.0_x64__qbz5n2kfra8p0\Lib\json\decoder.py", line 356, in raw_decode
     raise JSONDecodeError("Expecting value", s, err.value) from None
 json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+2025-02-12 23:11:51,374 - ERROR - _path_exists: path should be string, bytes, os.PathLike or integer, not StringVar
+Traceback (most recent call last):
+  File "D:\Huffman-Encoding\gui.py", line 293, in open_huffman_encoder
+    if not os.path.exists(path=path):
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: _path_exists: path should be string, bytes, os.PathLike or integer, not StringVar
+2025-02-12 23:11:57,504 - ERROR - _path_exists: path should be string, bytes, os.PathLike or integer, not StringVar
+Traceback (most recent call last):
+  File "D:\Huffman-Encoding\gui.py", line 293, in open_huffman_encoder
+    if not os.path.exists(path=path):
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: _path_exists: path should be string, bytes, os.PathLike or integer, not StringVar
+2025-02-12 23:12:12,079 - ERROR - Uncaught Exception
+Traceback (most recent call last):
+  File "D:\Huffman-Encoding\main.py", line 5, in <module>
+    gui.run()
+  File "D:\Huffman-Encoding\gui.py", line 728, in run
+    def run(self):
+        ^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.12_3.12.2544.0_x64__qbz5n2kfra8p0\Lib\tkinter\__init__.py", line 1505, in mainloop
+    self.tk.mainloop(n)
+KeyboardInterrupt
+2025-02-12 23:12:18,349 - ERROR - _path_exists: path should be string, bytes, os.PathLike or integer, not StringVar
+Traceback (most recent call last):
+  File "D:\Huffman-Encoding\gui.py", line 294, in open_huffman_encoder
+    if not os.path.exists(path=path):
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: _path_exists: path should be string, bytes, os.PathLike or integer, not StringVar
+2025-02-12 23:12:34,158 - ERROR - Uncaught Exception
+Traceback (most recent call last):
+  File "D:\Huffman-Encoding\main.py", line 5, in <module>
+    gui.run()
+  File "D:\Huffman-Encoding\gui.py", line 729, in run
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.12_3.12.2544.0_x64__qbz5n2kfra8p0\Lib\tkinter\__init__.py", line 1505, in mainloop
+    self.tk.mainloop(n)
+KeyboardInterrupt
+2025-02-12 23:12:47,668 - ERROR - [Errno 2] No such file or directory: ''
+Traceback (most recent call last):
+  File "D:\Huffman-Encoding\gui.py", line 266, in new_huffman_encoder
+    with open(file=path.get(), mode='r') as file:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: ''
