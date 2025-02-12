@@ -24,7 +24,9 @@ class GUI():
         self.save_name.set("None")
 
         try:
-            self.load_save("default.json")
+            current_folder = os.path.dirname(os.path.abspath(__file__))
+            default_path = os.path.join(current_folder, "settings", "default.json")
+            self.load_save(default_path)
         except Exception as e:
             pass
 
@@ -60,11 +62,11 @@ class GUI():
             parameters = tk.Menu(bar)
 
             # Sub-Menu Buttons
-            encoding.add_command(label="New Huffman Encoding",
+            encoding.add_command(label="New Encoder",
                                  command=self.new_huffman_encoder)
-            encoding.add_command(label="Open Huffman Encoding",
+            encoding.add_command(label="Open Encoder",
                                  command=self.open_huffman_encoder)
-            encoding.add_command(label="Save Huffman Encoding",
+            encoding.add_command(label="Save As",
                                  command=self.save_huffman_encoder)
 
             parameters.add_command(label="Encoding and Statistics", 
@@ -78,7 +80,7 @@ class GUI():
                                    command=self.root.quit)
 
             # Menu Button
-            bar.add_cascade(label="Encoding", 
+            bar.add_cascade(label="Encoder", 
                             menu=encoding)
             bar.add_cascade(label="Parameters", 
                             menu=parameters)
@@ -255,7 +257,7 @@ class GUI():
         try:
             with open(file=path.get(), mode='r') as file:
                 self.encoder.set_huffman(text=file.read())
-                self.save_name.set(value="untitled.json")
+                self.save_name.set(value="untitled.json*")
                 messagebox.showinfo(title="Success", 
                                     message="A new huffman encoding was successfully generated.")
                 
@@ -648,10 +650,11 @@ class GUI():
         # Get text file to compress and compress.
 
         if self.encoder.char_to_bin_index == None:
-            messagebox.showerror(
-                "Error", "No encoder detected. Please open or create an encoder to compress files.")
+            messagebox.showerror(title="Error", 
+                                 message="No encoder detected. Please open or create an encoder to compress files.")
         elif not self.compression_file_path.get():
-            messagebox.showerror("Error", "Please select a file to compress.")
+            messagebox.showerror(title="Error", 
+                                 message="Please select a file to compress.")
         elif not self.compression_target_path.get():
             self.compression_target_path.set("")
         else:
@@ -663,13 +666,13 @@ class GUI():
                 # Save to target path.
                 with open(self.compression_target_path.get(), 'wb') as file:
                     file.write(res)
-                messagebox.showinfo(
-                    "Success", f"File succesfully encoded to: {self.compression_target_path.get()}")
+                messagebox.showinfo(title="Success", 
+                                    message=f"File succesfully encoded to: {self.compression_target_path.get()}")
                 self.reset_menus()
             except Exception as e:
-                messagebox.showerror(
-                    "Error", "An error has occured during compression. Please see log file for more details.")
-                logging.error(str(e), exc_info=True)
+                messagebox.showerror(title="Error", 
+                                     message="An error has occured during compression. Please see log file for more details.")
+                logging.error(msg=str(e), exc_info=True)
         return None
 
     def extract(self) -> int:
@@ -682,10 +685,11 @@ class GUI():
         """
 
         if self.encoder.char_to_bin_index == None:
-            messagebox.showerror(
-                "Error", "No encoder detected. Please open or create an encoder to extract files.")
+            messagebox.showerror(title="Error", 
+                                 message="No encoder detected. Please open or create an encoder to extract files.")
         elif not self.extraction_file_path.get():
-            messagebox.showerror("Error", "Please select a file to extract.")
+            messagebox.showerror(title="Error", 
+                                 message="Please select a file to extract.")
         elif not self.extraction_target_path.get():
             self.compression_target_path.set("")
         else:
@@ -697,13 +701,14 @@ class GUI():
                 # Save to target path.
                 with open(self.extraction_target_path.get(), 'w') as file:
                     file.write(res)
-                messagebox.showinfo(
-                    "Success", f"File succesfully extracted to: {self.extraction_target_path.get()}")
+                messagebox.showinfo(title="Success", 
+                                    message=f"File succesfully extracted to: {self.extraction_target_path.get()}")
                 self.reset_menus()
+
             except Exception as e:
-                messagebox.showerror(
-                    "Error", "An error has occured during extraction. Please see log files for more details.")
-                logging.error(str(e), exc_info=True)
+                messagebox.showerror(title="Error", 
+                                     message="An error has occured during extraction. Please see log files for more details.")
+                logging.error(msg=str(e), exc_info=True)
         return None
 
     # ***** Run *****
