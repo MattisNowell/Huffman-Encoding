@@ -1,0 +1,97 @@
+2025-02-12 15:28:35,119 - ERROR - Uncaught Exception
+Traceback (most recent call last):
+  File "D:\Huffman-Encoding\main.py", line 5, in <module>
+    gui.run()
+  File "D:\Huffman-Encoding\gui.py", line 712, in run
+    self.root.mainloop()
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.12_3.12.2544.0_x64__qbz5n2kfra8p0\Lib\tkinter\__init__.py", line 1505, in mainloop
+    self.tk.mainloop(n)
+KeyboardInterrupt
+2025-02-12 15:29:01,217 - ERROR - bad file type ".json", should be "typeName {extension ?extensions ...?} ?{macType ?macTypes ...?}?"
+Traceback (most recent call last):
+  File "D:\Huffman-Encoding\gui.py", line 544, in browse_save_files
+    file_path = filedialog.asksaveasfilename(title=title,
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.12_3.12.2544.0_x64__qbz5n2kfra8p0\Lib\tkinter\filedialog.py", line 390, in asksaveasfilename
+    return SaveAs(**options).show()
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.12_3.12.2544.0_x64__qbz5n2kfra8p0\Lib\tkinter\commondialog.py", line 45, in show
+    s = master.tk.call(self.command, *master._options(self.options))
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_tkinter.TclError: bad file type ".json", should be "typeName {extension ?extensions ...?} ?{macType ?macTypes ...?}?"
+2025-02-12 15:32:01,188 - ERROR - Uncaught Exception
+Traceback (most recent call last):
+  File "D:\Huffman-Encoding\main.py", line 5, in <module>
+    gui.run()
+  File "D:\Huffman-Encoding\gui.py", line 712, in run
+    self.root.mainloop()
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.12_3.12.2544.0_x64__qbz5n2kfra8p0\Lib\tkinter\__init__.py", line 1505, in mainloop
+    self.tk.mainloop(n)
+KeyboardInterrupt
+2025-02-12 15:32:11,442 - ERROR - bad file type "*.json", should be "typeName {extension ?extensions ...?} ?{macType ?macTypes ...?}?"
+Traceback (most recent call last):
+  File "D:\Huffman-Encoding\gui.py", line 544, in browse_save_files
+    file_path = filedialog.asksaveasfilename(title=title,
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.12_3.12.2544.0_x64__qbz5n2kfra8p0\Lib\tkinter\filedialog.py", line 390, in asksaveasfilename
+    return SaveAs(**options).show()
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.12_3.12.2544.0_x64__qbz5n2kfra8p0\Lib\tkinter\commondialog.py", line 45, in show
+    s = master.tk.call(self.command, *master._options(self.options))
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_tkinter.TclError: bad file type "*.json", should be "typeName {extension ?extensions ...?} ?{macType ?macTypes ...?}?"
+2025-02-12 15:33:02,264 - ERROR - Uncaught Exception
+Traceback (most recent call last):
+  File "D:\Huffman-Encoding\main.py", line 5, in <module>
+    gui.run()
+  File "D:\Huffman-Encoding\gui.py", line 712, in run
+    self.root.mainloop()
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.12_3.12.2544.0_x64__qbz5n2kfra8p0\Lib\tkinter\__init__.py", line 1505, in mainloop
+    self.tk.mainloop(n)
+KeyboardInterrupt
+2025-02-12 15:34:02,698 - ERROR - [Errno 2] No such file or directory: 'D:/Huffman-Encoding/samples/sample2.bin/compressed.bin'
+Traceback (most recent call last):
+  File "D:\Huffman-Encoding\gui.py", line 664, in compress
+    with open(f"{self.compression_target_path.get()}/compressed.bin", 'wb') as file:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: 'D:/Huffman-Encoding/samples/sample2.bin/compressed.bin'
+2025-02-12 15:34:11,461 - ERROR - [Errno 2] No such file or directory: 'D:/Huffman-Encoding/samples/sample2.bin/compressed.bin'
+Traceback (most recent call last):
+  File "D:\Huffman-Encoding\gui.py", line 664, in compress
+    with open(f"{self.compression_target_path.get()}/compressed.bin", 'wb') as file:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: 'D:/Huffman-Encoding/samples/sample2.bin/compressed.bin'
+2025-02-12 15:57:07,553 - ERROR - [Errno 2] No such file or directory: 'D:/Huffman-Encoding/samples/sample1.bin/compressed.bin'
+Traceback (most recent call last):
+  File "D:\Huffman-Encoding\gui.py", line 664, in compress
+    with open(f"{self.compression_target_path.get()}/compressed.bin", 'wb') as file:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: 'D:/Huffman-Encoding/samples/sample1.bin/compressed.bin'
+2025-02-12 16:01:27,997 - ERROR - Uncaught Exception
+Traceback (most recent call last):
+  File "D:\Huffman-Encoding\main.py", line 5, in <module>
+    gui.run()
+  File "D:\Huffman-Encoding\gui.py", line 712, in run
+    self.root.mainloop()
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.12_3.12.2544.0_x64__qbz5n2kfra8p0\Lib\tkinter\__init__.py", line 1505, in mainloop
+    self.tk.mainloop(n)
+KeyboardInterrupt
+2025-02-12 16:01:35,475 - ERROR - Expecting value: line 1 column 1 (char 0)
+Traceback (most recent call last):
+  File "D:\Huffman-Encoding\gui.py", line 289, in open_huffman_encoder
+    self.load_save(path.get())
+  File "D:\Huffman-Encoding\gui.py", line 629, in load_save
+    data = json.load(json_file)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.12_3.12.2544.0_x64__qbz5n2kfra8p0\Lib\json\__init__.py", line 293, in load
+    return loads(fp.read(),
+           ^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.12_3.12.2544.0_x64__qbz5n2kfra8p0\Lib\json\__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.12_3.12.2544.0_x64__qbz5n2kfra8p0\Lib\json\decoder.py", line 338, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.12_3.12.2544.0_x64__qbz5n2kfra8p0\Lib\json\decoder.py", line 356, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
