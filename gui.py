@@ -17,6 +17,14 @@ class GUI():
 
         self.root.resizable(False, False)
 
+        try:
+            current_folder = os.path.dirname(os.path.abspath(__file__))
+            icon_path = os.path.join(current_folder, "settings", "icon.ico")
+            self.root.iconbitmap(icon_path)
+        except Exception as e:
+            print(str(e))
+            pass
+
         self.notebook = ttk.Notebook(self.root)
         self.notebook.pack(expand=True, fill='both')
 
