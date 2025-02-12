@@ -290,6 +290,9 @@ class GUI():
                               filetype=[("JSON File", "*.json")], 
                               title="Open File")
             
+            if not os.path.exists(path=path.get()):
+                return None
+            
         except Exception as e:
             logging.error(msg=str(e), exc_info=True)
             return None
