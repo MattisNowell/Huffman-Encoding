@@ -19,7 +19,7 @@ class GUI():
 
         try:
             current_folder = os.path.dirname(os.path.abspath(__file__))
-            icon_path = os.path.join(current_folder, "settings", "icon.ico")
+            icon_path = os.path.join(current_folder, "assets", "icon.ico")
             self.root.iconbitmap(icon_path)
         except Exception as e:
             print(str(e))
@@ -33,7 +33,7 @@ class GUI():
 
         try:
             current_folder = os.path.dirname(os.path.abspath(__file__))
-            default_path = os.path.join(current_folder, "settings", "default.json")
+            default_path = os.path.join(current_folder, "saves", "default.json")
             self.load_save(default_path)
         except Exception as e:
             pass
