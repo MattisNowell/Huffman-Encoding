@@ -1,54 +1,57 @@
 import tkinter as tk
-from tkinter import filedialog, messagebox, ttk
-from huffman import Huffman
-import json
-import os
-import logging
-import sys
+from tkinter import messagebox, ttk
+from encoder import Huffman
+from interface import EncoderFileInterface
+from file_operations import FileOperator
+import os, logging, sys
 
 
-class GUI():
+class EncoderGUI():
 
-    def __init__(self):
-        self.encoder = Huffman()
+    def __init__(self, encoder:Huffman):
+        self.file_manager = EncoderFileInterface(Huffman())
 
         self.root = tk.Tk()
-        self.root.title("Huffman Compressor")
-
+        self.root.title("Compressor")
         self.root.resizable(False, False)
 
+        # Add ICON if available.
         try:
             current_folder = os.path.dirname(os.path.abspath(__file__))
             icon_path = os.path.join(current_folder, "assets", "icon.ico")
             self.root.iconbitmap(icon_path)
         except Exception as e:
             print(str(e))
-            pass
 
-        self.notebook = ttk.Notebook(self.root)
-        self.notebook.pack(expand=True, fill='both')
+        self.save_name = tk.StringVar(self.root, "None")
 
-        self.save_name = tk.StringVar()
-        self.save_name.set("None")
-
+        # Open default encoder if available.
         try:
             current_folder = os.path.dirname(os.path.abspath(__file__))
             default_path = os.path.join(current_folder, "saves", "default.json")
-            self.load_save(default_path)
+            save_name = self.file_manager.open_encoder(default_path)
+            self.save_name.set(save_name)
         except Exception as e:
+            print(str(e))
             pass
 
-        logging.basicConfig(
-            filename="error.log",
-            level=logging.ERROR,
-            format="%(asctime)s - %(levelname)s - %(message)s"
-        )
+        # Notebooks allow for multiple tabs within the app.
+        self.notebook = ttk.Notebook(self.root)
+        self.notebook.pack(expand=True, fill='both')
 
-        sys.excepthook = self.global_error_handler
-
+        # Launching all menus and UIs.
         self.top_menu()
         self.compression_menu()
         self.extraction_menu()
+
+        # Setting up logging.
+        log_path = os.path.join(current_folder, "logs", "error.log")
+        logging.basicConfig(
+            filename=log_path,
+            level=logging.ERROR,
+            format="%(asctime)s - %(levelname)s - %(message)s"
+        ) 
+        sys.excepthook = self.global_error_handler
 
     def global_error_handler(self, exctype, value, traceback):
         logging.error("Uncaught Exception", exc_info=(
@@ -71,11 +74,11 @@ class GUI():
 
             # Sub-Menu Buttons
             encoding.add_command(label="New Encoder",
-                                 command=self.new_huffman_encoder)
+                                 command=lambda: self.save_name.set(self.file_manager.new_encoder()))
             encoding.add_command(label="Open Encoder",
-                                 command=self.open_huffman_encoder)
+                                 command=lambda: self.save_name.set(self.file_manager.open_encoder()))
             encoding.add_command(label="Save As",
-                                 command=self.save_huffman_encoder)
+                                 command=lambda: self.save_name.set(self.file_manager.save_encoder()))
 
             parameters.add_command(label="Encoding and Statistics", 
                                    command=self.encoding_stats)
@@ -96,8 +99,7 @@ class GUI():
             self.root.config(menu=bar)
 
         except Exception as e:
-            messagebox.showerror(title="Error", 
-                                 message="An UI error occured. Please see log files for details.")
+            messagebox.showerror(title="Error", message="An UI error occured. Please see log files for details.")
             logging.error(msg=str(e), exc_info=True)
 
     def compression_menu(self) -> None:
@@ -113,45 +115,46 @@ class GUI():
             compression_tab = ttk.Frame(self.notebook)
             self.notebook.add(compression_tab, text="Compress")
 
-            tk.Label(compression_tab, textvariable=self.save_name).grid(
-                row=0, column=0, padx=10, pady=10)
+            save_label = tk.Label(compression_tab, textvariable=self.save_name)
 
             # COMPRESSION TITLE
-            tk.Label(compression_tab, text="Compress").grid(
-                row=1, column=0, padx=10, pady=10)
+            compress_label = tk.Label(compression_tab, text="Compress")
 
             # COMPRESSION FILE ENTRY AND BROWSER
             self.compression_file_path = tk.StringVar()
-            entry = tk.Entry(
-                compression_tab, textvariable=self.compression_file_path, width=50)
-            entry.grid(row=2, 
-                       column=0, 
-                       padx=10, 
-                       pady=10)
-            entry.config(state="readonly")
+            file_path_entry = tk.Entry(compression_tab, textvariable=self.compression_file_path, width=50)
+            file_path_entry.config(state="readonly")
 
-            tk.Button(compression_tab, text="Select File", command=lambda: self.browse_files(path=self.compression_file_path, 
-                                                                                             filetype=[("Text Files", "*.txt")], 
-                                                                                             title="Select File")).grid(row=3, column=0, padx=10, pady=10)
-
+            browse_file = lambda: self.compression_file_path.set(FileOperator.browse_files(
+                filetypes=[("Text Files", "*.txt")], 
+                title="Select File"
+            ))
+            browse_file_button = tk.Button(compression_tab, text="Select File", command=browse_file)
+            
             # COMPRESSION FOLDER ENTRY AND BROWSER
             self.compression_target_path = tk.StringVar()
-            entry = tk.Entry(
-                compression_tab, textvariable=self.compression_target_path, width=50)
-            entry.grid(row=4, column=0, padx=10, pady=10)
-            entry.config(state="readonly")
+            save_path_entry = tk.Entry(compression_tab, textvariable=self.compression_target_path, width=50)
+            save_path_entry.config(state="readonly")
 
-            tk.Button(compression_tab, text="Save As", command=lambda: self.browse_save_files(
-                self.compression_target_path, 
-                filetype=[("Binary File", "*.bin")], 
+            browse_save = lambda: self.compression_target_path.set(FileOperator.browse_save_files(
+                filetypes=[("Binary File", "*.bin")], 
                 defaultextension=".bin", 
                 initialfile=os.path.splitext(os.path.basename(self.compression_file_path.get()))[0], 
                 title="Save As"
-                )).grid(row=5, column=0, padx=10, pady=10)
-
+            ))
+            browse_save_button = tk.Button(compression_tab, text="Save As", command=browse_save)
+            
             # COMPRESS
-            tk.Button(compression_tab, text="Compress", command=self.compress).grid(
-                row=7, column=0, padx=10, pady=10)
+            compress_button = tk.Button(compression_tab, text="Compress", command=lambda: self.file_manager.compress(self.compression_file_path.get(), self.compression_target_path.get()))
+            
+            # Position UI elements:
+            save_label.grid(row=0, column=0, padx=10, pady=10)
+            compress_label.grid(row=1, column=0, padx=10, pady=10)
+            file_path_entry.grid(row=2, column=0, padx=10, pady=10)
+            browse_file_button.grid(row=3, column=0, padx=10, pady=10)
+            save_path_entry.grid(row=4, column=0, padx=10, pady=10)
+            browse_save_button.grid(row=5, column=0, padx=10, pady=10)
+            compress_button.grid(row=7, column=0, padx=10, pady=10)
 
         except Exception as e:
             messagebox.showerror(
@@ -171,55 +174,49 @@ class GUI():
             extraction_tab = ttk.Frame(self.notebook)
             self.notebook.add(extraction_tab, text="Extract")
 
-            tk.Label(extraction_tab, textvariable=self.save_name).grid(row=0, 
-                                                                       column=0, 
-                                                                       padx=10, 
-                                                                       pady=10)
+            save_label = tk.Label(extraction_tab, textvariable=self.save_name)
 
             # EXTRACTION TITLE
-            tk.Label(extraction_tab, text="Extract").grid(
-                row=1, column=0, padx=10, pady=10)
+            extract_label = tk.Label(extraction_tab, text="Extract")
 
             # EXTRACTION FILE ENTRY AND BROWSER
             self.extraction_file_path = tk.StringVar()
-            entry = tk.Entry(extraction_tab, 
-                             textvariable=self.extraction_file_path, 
-                             width=50)
-            entry.grid(row=2, 
-                       column=0, 
-                       padx=10, 
-                       pady=10)
-            entry.config(state="readonly")
+            file_path_entry = tk.Entry(extraction_tab, textvariable=self.extraction_file_path, width=50)
+            file_path_entry.config(state="readonly")
 
-            tk.Button(extraction_tab, 
-                      text="Select File", 
-                      command=lambda: 
-                      self.browse_files(self.extraction_file_path, 
-                                        filetype=[("Binary Files", "*.bin")], 
-                                        title="Select File")).grid(row=3, column=0, padx=10, pady=10)
+            browse_file = lambda: self.extraction_file_path.set(FileOperator.browse_files(
+                filetypes=[("Binary Files", "*.bin")], 
+                title="Select File"
+            ))
+            browse_file_button = tk.Button(extraction_tab, text="Select File", command=browse_file)
 
             # EXTRACTION TARGET FOLDER ENTRY AND BROWSER
             self.extraction_target_path = tk.StringVar()
-            entry = tk.Entry(
-                extraction_tab, textvariable=self.extraction_target_path, width=50)
-            entry.grid(row=4, column=0, padx=10, pady=10)
-            entry.config(state="disabled")
+            save_path_entry = tk.Entry(extraction_tab, textvariable=self.extraction_target_path, width=50)
+            save_path_entry.config(state="disabled")
 
-            tk.Button(extraction_tab, text="Save As", command=lambda: self.browse_save_files(
-                self.extraction_target_path, 
-                filetype=[("Text File", "*.txt")], 
+            browse_save = lambda: self.extraction_target_path.set(FileOperator.browse_save_files(
+                filetypes=[("Text File", "*.txt")], 
                 defaultextension=".txt", 
                 initialfile=os.path.splitext(os.path.basename(self.extraction_file_path.get()))[0], 
                 title="Save As"
-                )).grid(row=5, column=0, padx=10, pady=10)
+            ))
+            browse_save_button = tk.Button(extraction_tab, text="Save As", command=browse_save)
 
             # EXTRACT
-            tk.Button(extraction_tab, text="Extract", command=self.extract).grid(
-                row=7, column=0, padx=10, pady=10)
+            extract_button = tk.Button(extraction_tab, text="Extract", command=lambda: self.file_manager.extract(self.extraction_file_path.get(), self.extraction_target_path.get()))
+
+            save_label.grid(row=0, column=0, padx=10, pady=10)
+            extract_label.grid(row=1, column=0, padx=10, pady=10)
+            file_path_entry.grid(row=2, column=0, padx=10, pady=10)
+            browse_file_button.grid(row=3, column=0, padx=10, pady=10)
+            save_path_entry.grid(row=4, column=0, padx=10, pady=10)
+            browse_save_button.grid(row=5, column=0, padx=10, pady=10)
+            extract_button.grid(row=7, column=0, padx=10, pady=10)
+            
 
         except Exception as e:
-            messagebox.showerror(title="Error", 
-                                 message="The UI error occured. Please see log files for details.")
+            messagebox.showerror(title="Error", message="The UI error occured. Please see log files for details.")
             logging.error(msg=str(e), exc_info=True)
 
     def reset_menus(self) -> None:
@@ -242,104 +239,6 @@ class GUI():
                                  message="An UI error occured. Please see log files for details.")
             logging.error(msg=str(e), exc_info=True)
 
-    # ***** ENCODING MENU ACTIONS *****
-
-    def new_huffman_encoder(self) -> None:
-        """ Generates a new huffman tree and a new corresponding binary encoding for future compressions and extractions.
-
-        Returns
-        -------
-        None
-        """
-
-        path = tk.StringVar()
-
-        # Ask the user for a text file from which generate the new huffman tree.
-        try:
-            self.browse_files(path, [("Text Files", "*.txt")], "Select File")
-        except:
-            logging.error(str(e), exc_info=True)
-            return None
-
-        # Generate the new huffman tree.
-        try:
-            with open(file=path.get(), mode='r') as file:
-                self.encoder.set_huffman(text=file.read())
-                self.save_name.set(value="untitled.json*")
-                messagebox.showinfo(title="Success", 
-                                    message="A new huffman encoding was successfully generated.")
-                
-        except Exception as e:
-            messagebox.showerror(title="Error", 
-                                 message="An error occurred with the selected file.")
-            logging.error(msg=str(e), exc_info=True)
-
-    def open_huffman_encoder(self) -> None:
-        """ 
-
-        Returns
-        -------
-        None
-        """
-
-        path = tk.StringVar()
-
-        # Ask the user for the huffman tree json save.
-        try:
-            self.browse_files(path=path, 
-                              filetype=[("JSON File", "*.json")], 
-                              title="Open File")
-            
-            if not os.path.exists(path=path.get()):
-                return None
-            
-        except Exception as e:
-            logging.error(msg=str(e), exc_info=True)
-            return None
-
-        # Load the save into the encoder.
-        try:
-            self.load_save(path.get())
-            messagebox.showinfo(title="Success", 
-                                message="The huffman encoding was successfully loaded.")
-            
-        except Exception as e:
-            messagebox.showerror(title="Error", 
-                                 message="The huffman encoding failed to load.")
-            logging.error(msg=str(e), exc_info=True)
-
-    def save_huffman_encoder(self) -> None:
-        """ Saves the currently loaded huffman encoding to the target path.
-
-        Returns
-        -------
-        None
-        """
-
-        path = tk.StringVar()
-
-        # Ask the user for the directory in which to save the huffman tree json file.
-        try:
-            self.browse_save_files(path=path, 
-                                   title="Save File As", 
-                                   defaultextension=".json", 
-                                   filetype=[("JSON Files", "*.json")],
-                                   initialfile="untitled")
-            
-        except Exception as e:
-            logging.error(msg=str(e), exc_info=True)
-            return None
-
-        # Save the huffman encoding in the directory as a json file.
-        try:
-            self.create_save(path.get())
-            messagebox.showinfo(title="Success", 
-                                message="The current huffman encoding was successfully saved.")
-            
-        except Exception as e:
-            messagebox.showerror(title="Error", 
-                                 message="The current huffman encoding failed to save.")
-            logging.error(str(e), exc_info=True)
 
     # ***** SETTINGS MENU ACTIONS *****
 
@@ -353,7 +252,7 @@ class GUI():
 
         try:
             # Displaying the stats and encoding.
-            if self.encoder.char_to_bin_index == None:
+            if self.file_manager.encoder.char_to_bin_index == None:
                 messagebox.showinfo(title="Information", 
                                     message="No encoder detected. Please open or create an encoder to see its details.")
                 return None
@@ -376,19 +275,16 @@ class GUI():
                                  pady=10, 
                                  expand=True)
 
-                self.listbox = tk.Listbox(
-                    left_frame, height=15, selectmode=tk.SINGLE)
+                self.listbox = tk.Listbox(left_frame, height=15, selectmode=tk.SINGLE)
                 self.listbox.pack(side=tk.LEFT, 
                                   fill=tk.BOTH, 
                                   expand=True)
 
-                items = [i for i in list(
-                    self.encoder.char_to_bin_index.keys())]
+                items = [i for i in list(self.file_manager.encoder.char_to_bin_index.keys())]
                 for i in items:
                     self.listbox.insert(tk.END, i)
 
-                self.listbox.bind("<<ListboxSelect>>",
-                                  self.display_character_info)
+                self.listbox.bind("<<ListboxSelect>>", self.display_character_info)
 
                 self.info = tk.Label(right_frame, 
                                      text="Select a character to view details", 
@@ -420,12 +316,11 @@ class GUI():
 
             # Get the data.
             char = self.listbox.get(selection[0])
-            percentage = self.encoder.char_percentages[char]
-            binary = self.encoder.char_to_bin_index[char]
+            percentage = self.file_manager.encoder.char_percentages[char]
+            binary = self.file_manager.encoder.char_to_bin_index[char]
 
             # Update the displayed string text.
-            self.info.config(
-                text=f"Character: {char}\n Percentage of appearance: {percentage}\nBinary Encoding: {binary}")
+            self.info.config(text=f"Character: {char}\n Percentage of appearance: {percentage}\nBinary Encoding: {binary}")
 
         except Exception as e:
             messagebox.showerror(title="Error", 
@@ -445,36 +340,48 @@ class GUI():
             settings_window = tk.Toplevel(self.root)
             settings_window.title("Help")
 
-            tk.Label(settings_window, text="Default Save Folder: ").grid(
-                row=0, column=0, padx=10, pady=10)
+            # Default Save setting UI:
+            default_save_label = tk.Label(settings_window, text="Default Save Folder: ")
 
             self.default_saving_dir_path = tk.StringVar()
-            entry = tk.Entry(
-                settings_window, textvariable=self.default_saving_dir_path, width=50)
-            entry.grid(row=0, column=1, padx=10, pady=10)
-            entry.config(state="readonly")
-            tk.Button(settings_window, text="Select Default Save Folder", command=lambda: self.browse_directories(
-                self.default_saving_dir_path, "Select Folder")).grid(row=1, column=0, padx=10, pady=10)
+            save_path_entry = tk.Entry(settings_window, textvariable=self.default_saving_dir_path, width=50)
+            save_path_entry.config(state="readonly")
 
-            tk.Label(settings_window, text="Default Encoder File: ").grid(
-                row=2, column=0, padx=10, pady=10)
+            browse_save = lambda: self.default_saving_dir_path.set(FileOperator.browse_directories( 
+                "Select Folder"
+            ))
+            browse_save_button = tk.Button(settings_window, text="Select Default Save Folder", command=browse_save)
+
+            # Default Encoder setting UI:
+            default_encoder_label = tk.Label(settings_window, text="Default Encoder File: ")
 
             self.default_encoding_file_path = tk.StringVar()
-            entry = tk.Entry(
-                settings_window, textvariable=self.default_encoding_file_path, width=50)
-            entry.grid(row=2, column=1, padx=10, pady=10)
-            entry.config(state="readonly")
-            tk.Button(settings_window, text="Select Default Encoder File", command=lambda: self.browse_files(
-                self.default_encoding_file_path,  [("Binary Files", "*.bin")], "Select File")).grid(row=3, column=0, padx=10, pady=10)
+            encoder_path_entry = tk.Entry(settings_window, textvariable=self.default_encoding_file_path, width=50)
+            encoder_path_entry.config(state="readonly")
 
-            tk.Button(settings_window, text="Save and Close", command=settings_window.destroy).grid(
-                row=4, column=1, padx=10, pady=10)
-            tk.Button(settings_window, text="Cancel", command=settings_window.destroy).grid(
-                row=4, column=0, padx=10, pady=10)
+            browse_encoder = lambda: self.default_encoding_file_path.set(FileOperator.browse_files(
+                [("Binary Files", "*.bin")], 
+                "Select File"
+            ))
+            browse_encoder_button = tk.Button(settings_window, text="Select Default Encoder File", command=browse_encoder)
+
+            # Close window UI:
+            save_close_button = tk.Button(settings_window, text="Save and Close", command=settings_window.destroy)
+
+            cancel_button = tk.Button(settings_window, text="Cancel", command=settings_window.destroy)
+
+            # Widget positions.
+            default_save_label.grid(row=0, column=0, padx=10, pady=10)
+            save_path_entry.grid(row=0, column=1, padx=10, pady=10)
+            browse_save_button.grid(row=1, column=0, padx=10, pady=10)
+            default_encoder_label.grid(row=2, column=0, padx=10, pady=10)
+            encoder_path_entry.grid(row=2, column=1, padx=10, pady=10)
+            browse_encoder_button.grid(row=3, column=0, padx=10, pady=10)
+            save_close_button.grid(row=4, column=1, padx=10, pady=10)
+            cancel_button.grid(row=4, column=0, padx=10, pady=10)
 
         except Exception as e:
-            messagebox.showerror(
-                "Error", "An UI error occured. Please see log files for more details.")
+            messagebox.showerror(title="Error", message="An UI error occured. Please see log files for more details.")
             logging.error(str(e), exc_info=True)
 
     def help(self) -> None:
@@ -490,237 +397,23 @@ class GUI():
             help_window = tk.Toplevel(self.root)
             help_window.title("Help")
 
-            # Help text:
-            help_text = "Select a huffman encoding."
-
             # Display the help dialogue.
-            tk.Label(help_window, text=help_text).grid(row=0, 
-                                                       column=0, 
-                                                       padx=10, 
-                                                       pady=10)
-            tk.Button(help_window, text="Close", command=help_window.destroy).grid(
-                row=1, column=0, padx=10, pady=10)
+            current_folder = os.path.dirname(os.path.abspath(__file__))
+            help_path = os.path.join(current_folder, "assets", "help.txt")
+            help_text = FileOperator.load(help_path)
+
+            help_label = tk.Label(help_window, text=help_text)
+
+            # Close Button
+            close_button = tk.Button(help_window, text="Close", command=help_window.destroy)
+
+            # Widget positions.
+            help_label.grid(row=0, column=0, padx=10, pady=10)
+            close_button.grid(row=1, column=0, padx=10, pady=10)
 
         except Exception as e:
-            messagebox.showerror(
-                "Error", "An UI error occured. Please see log files for more details.")
+            messagebox.showerror(title="Error", message="An UI error occured. Please see log files for more details.")
             logging.error(str(e), exc_info=True)
-
-    # ***** FILE EXPLORER BROWSING ACTIONS *****
-
-    def browse_files(self, path: tk.StringVar, filetype: list, title: str = '') -> None:
-        """ Get an input from the user to select a file.
-
-        Parameters
-        ----------
-        path : tk.StringVar
-            String variable class from the tkinter chosen to contain the user-selected path.
-        filetype: list 
-            List of tuple descriptions of the file types to be constrained to in the file explorer.
-        title:
-            Title to be displayed in the file explorer.
-
-        Returns
-        -------
-        None
-        """
-
-        try:
-            file_path = filedialog.askopenfilename(title=title, 
-                                                   filetype=filetype)
-            if file_path:
-                path.set(file_path)
-        except Exception as e:
-            messagebox.showerror(title="Error", 
-                                 message="The file operation failed. Please see log files for more details.")
-            logging.error(msg=str(e), exc_info=True)
-            raise
-
-    def browse_save_files(self, path: tk.StringVar, filetype: list, defaultextension: str = ".json", title: str = '', initialfile:str="untitled") -> None:
-        """ Get an input from the user to select a file.
-
-        Parameters
-        ----------
-        path : tk.StringVar
-            String variable class from the tkinter chosen to contain the user-selected path.
-        filetype: list 
-            List of tuple descriptions of the file types to be constrained to in the file explorer.
-        title:
-            Title to be displayed in the file explorer.
-
-        Returns
-        -------
-        None
-        """
-
-        try:
-            file_path = filedialog.asksaveasfilename(title=title, 
-                                                     defaultextension=defaultextension, 
-                                                     initialfile=initialfile, 
-                                                     filetypes=filetype)
-            if file_path:
-                path.set(file_path)
-
-        except Exception as e:
-            messagebox.showerror(title="Error", 
-                                 message="The file operation failed. Please see log files for more details.")
-            logging.error(msg=str(e), exc_info=True)
-            raise
-
-    def browse_directories(self, path: tk.StringVar, title: str = '') -> None:
-        """ Get an input from the user to select a folder. The path is saved in a given path variable.
-
-        Parameters
-        ----------     
-        path : tk.StringVar
-            String variable class from the tkinter chosen to contain the user-selected path.
-        title:
-            Title to be displayed in the file explorer.
-
-        Returns
-        -------
-        None
-        """
-
-        try:
-            directory_path = filedialog.askdirectory(title=title)
-            if directory_path:
-                path.set(directory_path)
-
-        except Exception as e:
-            messagebox.showerror(title="Error", 
-                                 message="The file operation failed. Please see log files for more details.")
-            logging.error(msg=str(e), exc_info=True)
-            raise
-
-    # ***** FILE SAVE AND LOAD FUNCTIONS *****
-
-    def create_save(self, path: str):
-        """ Saves the object's huffman tree parameters from a specified JSON file.
-
-        Parameters
-        ----------
-        path : str
-            Text string to represents a path to the file to save the JSON Huffman tree parameters into.
-
-        Returns
-        -------
-        str
-            An error message.
-        """
-
-        # Saving the Huffman parameters in a file.
-        try:
-            with open(path, "w") as json_file:
-                data = [os.path.basename(path), 
-                        self.encoder.char_to_bin_index,
-                        self.encoder.bin_to_char_index, 
-                        self.encoder.char_percentages]
-                json.dump(data, json_file, indent=4)
-                self.save_name.set(data[0])
-
-        except Exception as e:
-            raise
-
-    def load_save(self, path: str) -> None:
-        """ Loads existing huffman tree parameters from a specified JSON file.
-
-        Parameters
-        ----------
-        path : str
-            Text string to represents a path to the file to load the JSON Huffman tree parameters from.
-
-        Returns
-        -------
-        str
-            An error message.
-        """
-
-        try:
-            if os.path.exists(path):
-                with open(path, 'r') as json_file:
-                    data = json.load(json_file)
-                    self.save_name.set(data[0])
-                    self.encoder.char_to_bin_index, self.encoder.bin_to_char_index, self.encoder.char_percentages = data[1], data[2], data[3]
-            else:
-                return None
-        except Exception as e:
-            raise
-
-    # ***** COMPRESS AND EXTRACT ACTIONS *****
-
-    def compress(self) -> None:
-        """ Gets the file to compress and compresses it to the directory file. 
-
-        Returns
-        -------
-        int
-            Error code with 0 being successful and 1 pointing to an error.
-        """
-
-        # Get text file to compress and compress.
-
-        if self.encoder.char_to_bin_index == None:
-            messagebox.showerror(title="Error", 
-                                 message="No encoder detected. Please open or create an encoder to compress files.")
-        elif not self.compression_file_path.get():
-            messagebox.showerror(title="Error", 
-                                 message="Please select a file to compress.")
-        elif not self.compression_target_path.get():
-            self.compression_target_path.set("")
-        else:
-            try:
-                res = None
-                # Compress file.
-                with open(self.compression_file_path.get(), 'r') as file:
-                    res = self.encoder.encode(file.read())
-                # Save to target path.
-                with open(self.compression_target_path.get(), 'wb') as file:
-                    file.write(res)
-                messagebox.showinfo(title="Success", 
-                                    message=f"File succesfully encoded to: {self.compression_target_path.get()}")
-                self.reset_menus()
-            except Exception as e:
-                messagebox.showerror(title="Error", 
-                                     message="An error has occured during compression. Please see log file for more details.")
-                logging.error(msg=str(e), exc_info=True)
-        return None
-
-    def extract(self) -> int:
-        """ Gets the file to extract and extracts it to the directory file. 
-
-        Returns
-        -------
-        int
-            Error code with 0 being successful and 1 pointing to an error.
-        """
-
-        if self.encoder.char_to_bin_index == None:
-            messagebox.showerror(title="Error", 
-                                 message="No encoder detected. Please open or create an encoder to extract files.")
-        elif not self.extraction_file_path.get():
-            messagebox.showerror(title="Error", 
-                                 message="Please select a file to extract.")
-        elif not self.extraction_target_path.get():
-            self.compression_target_path.set("")
-        else:
-            try:
-                res = None
-                # Exract file.
-                with open(self.extraction_file_path.get(), 'rb') as file:
-                    res = self.encoder.decode(file.read())
-                # Save to target path.
-                with open(self.extraction_target_path.get(), 'w') as file:
-                    file.write(res)
-                messagebox.showinfo(title="Success", 
-                                    message=f"File succesfully extracted to: {self.extraction_target_path.get()}")
-                self.reset_menus()
-
-            except Exception as e:
-                messagebox.showerror(title="Error", 
-                                     message="An error has occured during extraction. Please see log files for more details.")
-                logging.error(msg=str(e), exc_info=True)
-        return None
 
     # ***** Run *****
 
