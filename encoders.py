@@ -1,12 +1,20 @@
 from collections import Counter
 from node import Node
 import string
+from abc import ABC, abstractmethod
 
-class Encoder:
+class EncoderNoneError(Exception):
 
+    def __init__(self, message = "Encoder value is None."):
+        super().__init__(message)
+
+class Encoder(ABC):
+
+    @abstractmethod
     def encode():
         pass
 
+    @abstractmethod
     def decode():
         pass
 
@@ -156,6 +164,9 @@ class Huffman(Encoder):
             The encoded text file as a sequence of bytes.
         """
 
+        if not self.char_to_bin_index:
+            raise EncoderNoneError 
+
         bin_encoding = ''
         for char in text:
             bin_encoding += self.char_to_bin_index[char]
@@ -179,6 +190,9 @@ class Huffman(Encoder):
         str
             The decoded text string.
         """
+
+        if not self.bin_to_char_index:
+            raise EncoderNoneError 
 
         # Converting the byte array into a binary value stored as a string. 
         bin_string = Huffman.byte_to_bit(byte_content)

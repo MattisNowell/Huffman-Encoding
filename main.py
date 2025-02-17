@@ -1,6 +1,6 @@
-from gui import HuffmanGUI
-from encoder import Huffman
+from gui import EncoderGUI
+from encoders import Huffman
 
 if __name__ == "__main__":
-    gui = HuffmanGUI(Huffman())
+    gui = EncoderGUI(Huffman())
     gui.run()

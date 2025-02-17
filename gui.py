@@ -1,63 +1,90 @@
 import tkinter as tk
 from tkinter import messagebox, ttk
-from encoder import Huffman
-from interface import EncoderFileInterface
-from file_operations import FileOperator
+from encoders import Huffman
+from encoder_interfaces import EncoderFileInterface, EncoderNoneError
+from file_operator import FileOperator, FileTypeError, PathNoneError
 import os, logging, sys
 
 
 class EncoderGUI():
 
     def __init__(self, encoder:Huffman):
-        self.file_manager = EncoderFileInterface(Huffman())
 
         self.root = tk.Tk()
         self.root.title("Compressor")
         self.root.resizable(False, False)
 
-        # Add ICON if available.
         try:
-            current_folder = os.path.dirname(os.path.abspath(__file__))
-            icon_path = os.path.join(current_folder, "assets", "icon.ico")
-            self.root.iconbitmap(icon_path)
+            self.file_manager = EncoderFileInterface(Huffman())
+
+            # Add ICON if available.
+            try:
+                current_folder = os.path.dirname(os.path.abspath(__file__))
+                icon_path = os.path.join(current_folder, "assets", "icon.ico")
+                self.root.iconbitmap(icon_path)
+
+            except Exception as e:
+                messagebox.showerror(title="Error", message="Failed to load icons. Please see log files for details.")
+                logging.error(msg=str(e), exc_info=True)
+
+
+            # Open default encoder if available.
+            self.save_name = tk.StringVar(self.root, "None")
+            try:
+                current_folder = os.path.dirname(os.path.abspath(__file__))
+                default_path = os.path.join(current_folder, "saves", "default.json")
+                save_name = self.file_manager.open_encoder(default_path)
+                self.save_name.set(save_name)
+            
+            except FileNotFoundError as e:
+                messagebox.showerror(title="Error", message="The provided default file was not found or does not exist. Please see log files for details.")
+                logging.error(msg=str(e), exc_info=True)
+
+
+            except FileTypeError as e:
+                messagebox.showerror(title="Error", message="The provided default file's extension is imcompatible. Please see log files for details.")
+                logging.error(msg=str(e), exc_info=True)
+
+
+            except Exception as e:
+                messagebox.showerror(title="Error", message="The provided default file failed to load. Please see log files for details.")
+                logging.error(msg=str(e), exc_info=True)
+
+            # Notebooks allow for multiple tabs within the app.
+            self.notebook = ttk.Notebook(self.root)
+            self.notebook.pack(expand=True, fill='both')
+
+            # Launching all menus and UIs.
+            self.top_menu()
+            self.compression_menu()
+            self.extraction_menu()
+
+            # Setting up logging.
+            try:
+                log_path = os.path.join(current_folder, "logs", "error.log")
+                logging.basicConfig(
+                    filename=log_path,
+                    level=logging.ERROR,
+                    format="%(asctime)s - %(levelname)s - %(message)s"
+                ) 
+                sys.excepthook = self.global_error_handler
+            
+            except Exception as e:
+                messagebox.showerror(title="Error", message="The logging system failed to set-up. Please see log files for details.")
+                logging.error(msg=str(e), exc_info=True)
+        
         except Exception as e:
+            messagebox.showerror(title="Error", message=f"The system failed to load. {str(e)}")       
             print(str(e))
 
-        self.save_name = tk.StringVar(self.root, "None")
-
-        # Open default encoder if available.
-        try:
-            current_folder = os.path.dirname(os.path.abspath(__file__))
-            default_path = os.path.join(current_folder, "saves", "default.json")
-            save_name = self.file_manager.open_encoder(default_path)
-            self.save_name.set(save_name)
-        except Exception as e:
-            print(str(e))
-            pass
-
-        # Notebooks allow for multiple tabs within the app.
-        self.notebook = ttk.Notebook(self.root)
-        self.notebook.pack(expand=True, fill='both')
-
-        # Launching all menus and UIs.
-        self.top_menu()
-        self.compression_menu()
-        self.extraction_menu()
-
-        # Setting up logging.
-        log_path = os.path.join(current_folder, "logs", "error.log")
-        logging.basicConfig(
-            filename=log_path,
-            level=logging.ERROR,
-            format="%(asctime)s - %(levelname)s - %(message)s"
-        ) 
-        sys.excepthook = self.global_error_handler
 
     def global_error_handler(self, exctype, value, traceback):
         logging.error("Uncaught Exception", exc_info=(
             exctype, value, traceback))
+        
+        
 
-    # ***** MENU DISPLAYS *****
+    # ***** MAIN MENUS *****
 
     def top_menu(self) -> None:
         """ Sets all the widgets for the top bar menu.  
@@ -125,27 +152,22 @@ class EncoderGUI():
             file_path_entry = tk.Entry(compression_tab, textvariable=self.compression_file_path, width=50)
             file_path_entry.config(state="readonly")
 
-            browse_file = lambda: self.compression_file_path.set(FileOperator.browse_files(
-                filetypes=[("Text Files", "*.txt")], 
-                title="Select File"
-            ))
-            browse_file_button = tk.Button(compression_tab, text="Select File", command=browse_file)
+            browse_file_button = tk.Button(compression_tab, text="Select File", command=lambda: self.compression_file_path.set(self.browse_files_handler(filetypes=[("Text Files", "*.txt")])))
+    
             
             # COMPRESSION FOLDER ENTRY AND BROWSER
             self.compression_target_path = tk.StringVar()
             save_path_entry = tk.Entry(compression_tab, textvariable=self.compression_target_path, width=50)
             save_path_entry.config(state="readonly")
 
-            browse_save = lambda: self.compression_target_path.set(FileOperator.browse_save_files(
-                filetypes=[("Binary File", "*.bin")], 
-                defaultextension=".bin", 
-                initialfile=os.path.splitext(os.path.basename(self.compression_file_path.get()))[0], 
-                title="Save As"
-            ))
-            browse_save_button = tk.Button(compression_tab, text="Save As", command=browse_save)
-            
+            defaultname = os.path.splitext(os.path.basename(self.compression_file_path.get()))[0]
+            browse_save_button = tk.Button(compression_tab, text="Save As", command=lambda: self.compression_target_path.set(self.browse_saves_handler(filetypes=[("Binary Files", "*.bin")], 
+                                                                                                                      defaultextension=".bin", 
+                                                                                                                      defaultname=defaultname)))
+
             # COMPRESS
-            compress_button = tk.Button(compression_tab, text="Compress", command=lambda: self.file_manager.compress(self.compression_file_path.get(), self.compression_target_path.get()))
+
+            compress_button = tk.Button(compression_tab, text="Compress", command=self.compress_handler)
             
             # Position UI elements:
             save_label.grid(row=0, column=0, padx=10, pady=10)
@@ -157,8 +179,7 @@ class EncoderGUI():
             compress_button.grid(row=7, column=0, padx=10, pady=10)
 
         except Exception as e:
-            messagebox.showerror(
-                "Error", "An UI error occured. Please log files for details.")
+            messagebox.showerror(title="Error", message="An UI error occured. Please log files for details.")
             logging.error(str(e), exc_info=True)
 
     def extraction_menu(self) -> None:
@@ -184,27 +205,21 @@ class EncoderGUI():
             file_path_entry = tk.Entry(extraction_tab, textvariable=self.extraction_file_path, width=50)
             file_path_entry.config(state="readonly")
 
-            browse_file = lambda: self.extraction_file_path.set(FileOperator.browse_files(
-                filetypes=[("Binary Files", "*.bin")], 
-                title="Select File"
-            ))
-            browse_file_button = tk.Button(extraction_tab, text="Select File", command=browse_file)
+            browse_file_button = tk.Button(extraction_tab, text="Select File", command=lambda: self.extraction_file_path.set(self.browse_files_handler(filetypes=[("Binary Files", "*.bin")])))
 
             # EXTRACTION TARGET FOLDER ENTRY AND BROWSER
             self.extraction_target_path = tk.StringVar()
             save_path_entry = tk.Entry(extraction_tab, textvariable=self.extraction_target_path, width=50)
-            save_path_entry.config(state="disabled")
+            save_path_entry.config(state="readonly")
 
-            browse_save = lambda: self.extraction_target_path.set(FileOperator.browse_save_files(
-                filetypes=[("Text File", "*.txt")], 
-                defaultextension=".txt", 
-                initialfile=os.path.splitext(os.path.basename(self.extraction_file_path.get()))[0], 
-                title="Save As"
-            ))
-            browse_save_button = tk.Button(extraction_tab, text="Save As", command=browse_save)
-
+            defaultname = os.path.splitext(os.path.basename(self.extraction_file_path.get()))[0]
+            browse_save_button = tk.Button(extraction_tab, text="Save As", command=lambda: self.extraction_target_path.set(self.browse_saves_handler(filetypes=[("Text Files", "*.txt")], 
+                                                                                                                     defaultextension=".txt", 
+                                                                                                                     defaultname=defaultname)))
+            
             # EXTRACT
-            extract_button = tk.Button(extraction_tab, text="Extract", command=lambda: self.file_manager.extract(self.extraction_file_path.get(), self.extraction_target_path.get()))
+            
+            extract_button = tk.Button(extraction_tab, text="Extract", command=self.extract_handler)
 
             save_label.grid(row=0, column=0, padx=10, pady=10)
             extract_label.grid(row=1, column=0, padx=10, pady=10)
@@ -214,33 +229,13 @@ class EncoderGUI():
             browse_save_button.grid(row=5, column=0, padx=10, pady=10)
             extract_button.grid(row=7, column=0, padx=10, pady=10)
             
-
         except Exception as e:
             messagebox.showerror(title="Error", message="The UI error occured. Please see log files for details.")
             logging.error(msg=str(e), exc_info=True)
 
-    def reset_menus(self) -> None:
-        """ Resets all entries in all menus to blank.  
-
-        Returns
-        -------
-        None
-        """
-
-        try:
-            self.compression_file_path.set("")
-            self.compression_target_path.set("")
-
-            self.extraction_file_path.set("")
-            self.extraction_target_path.set("")
-
-        except Exception as e:
-            messagebox.showerror(title="Error", 
-                                 message="An UI error occured. Please see log files for details.")
-            logging.error(msg=str(e), exc_info=True)
 
 
-    # ***** SETTINGS MENU ACTIONS *****
+    # ***** SETTINGS MENUS *****
 
     def encoding_stats(self) -> None:
         """ Creates a new window with the current huffman tree's statistics and binary encoding information. 
@@ -262,29 +257,19 @@ class EncoderGUI():
                 stats_window.title("Encoding and Statistics")
 
                 left_frame = tk.Frame(stats_window)
-                left_frame.pack(side=tk.LEFT, 
-                                fill=tk.BOTH,
-                                padx=10, 
-                                pady=10, 
-                                expand=True)
+                left_frame.pack(side=tk.LEFT, fill=tk.BOTH, padx=10, pady=10, expand=True)
 
                 right_frame = tk.Frame(stats_window)
-                right_frame.pack(side=tk.LEFT, 
-                                 fill=tk.BOTH,
-                                 padx=10, 
-                                 pady=10, 
-                                 expand=True)
+                right_frame.pack(side=tk.LEFT, fill=tk.BOTH, padx=10, pady=10, expand=True)
 
                 self.listbox = tk.Listbox(left_frame, height=15, selectmode=tk.SINGLE)
-                self.listbox.pack(side=tk.LEFT, 
-                                  fill=tk.BOTH, 
-                                  expand=True)
+                self.listbox.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
 
                 items = [i for i in list(self.file_manager.encoder.char_to_bin_index.keys())]
                 for i in items:
                     self.listbox.insert(tk.END, i)
 
-                self.listbox.bind("<<ListboxSelect>>", self.display_character_info)
+                self.listbox.bind("<<ListboxSelect>>", self.display_character_info_handler)
 
                 self.info = tk.Label(right_frame, 
                                      text="Select a character to view details", 
@@ -293,34 +278,6 @@ class EncoderGUI():
                                      wraplength=200)
                 
                 self.info.pack(pady=10, anchor="w")
-
-        except Exception as e:
-            messagebox.showerror(title="Error", 
-                                 message="An UI error occured. Please see log files for more details.")
-            logging.error(msg=str(e), exc_info=True)
-
-    def display_character_info(self, event) -> None:
-        """ Updates the character information frame of the statistics window when selecting a specific character.
-
-        Returns
-        -------
-        None
-        """
-
-        try:
-            # Get the current selection.
-            selection = self.listbox.curselection()
-
-            if not selection:
-                return None
-
-            # Get the data.
-            char = self.listbox.get(selection[0])
-            percentage = self.file_manager.encoder.char_percentages[char]
-            binary = self.file_manager.encoder.char_to_bin_index[char]
-
-            # Update the displayed string text.
-            self.info.config(text=f"Character: {char}\n Percentage of appearance: {percentage}\nBinary Encoding: {binary}")
 
         except Exception as e:
             messagebox.showerror(title="Error", 
@@ -347,10 +304,14 @@ class EncoderGUI():
             save_path_entry = tk.Entry(settings_window, textvariable=self.default_saving_dir_path, width=50)
             save_path_entry.config(state="readonly")
 
-            browse_save = lambda: self.default_saving_dir_path.set(FileOperator.browse_directories( 
-                "Select Folder"
-            ))
-            browse_save_button = tk.Button(settings_window, text="Select Default Save Folder", command=browse_save)
+            try:
+                browse_save = lambda: self.default_saving_dir_path.set(FileOperator.browse_directories( 
+                    "Select Folder"
+                ))
+                browse_save_button = tk.Button(settings_window, text="Select Default Save Folder", command=browse_save)
+            
+            except Exception as e:
+                pass
 
             # Default Encoder setting UI:
             default_encoder_label = tk.Label(settings_window, text="Default Encoder File: ")
@@ -359,11 +320,15 @@ class EncoderGUI():
             encoder_path_entry = tk.Entry(settings_window, textvariable=self.default_encoding_file_path, width=50)
             encoder_path_entry.config(state="readonly")
 
-            browse_encoder = lambda: self.default_encoding_file_path.set(FileOperator.browse_files(
-                [("Binary Files", "*.bin")], 
-                "Select File"
-            ))
-            browse_encoder_button = tk.Button(settings_window, text="Select Default Encoder File", command=browse_encoder)
+            try:
+                browse_encoder = lambda: self.default_encoding_file_path.set(FileOperator.browse_files(
+                    [("Binary Files", "*.bin")], 
+                    "Select File"
+                ))
+                browse_encoder_button = tk.Button(settings_window, text="Select Default Encoder File", command=browse_encoder)
+            
+            except Exception as e:
+                pass
 
             # Close window UI:
             save_close_button = tk.Button(settings_window, text="Save and Close", command=settings_window.destroy)
@@ -400,6 +365,7 @@ class EncoderGUI():
             # Display the help dialogue.
             current_folder = os.path.dirname(os.path.abspath(__file__))
             help_path = os.path.join(current_folder, "assets", "help.txt")
+
             help_text = FileOperator.load(help_path)
 
             help_label = tk.Label(help_window, text=help_text)
@@ -410,10 +376,134 @@ class EncoderGUI():
             # Widget positions.
             help_label.grid(row=0, column=0, padx=10, pady=10)
             close_button.grid(row=1, column=0, padx=10, pady=10)
+    
+        except FileTypeError as e:
+            print("Provided help text is of the wrong file type.")
+        
+        except FileNotFoundError as e:
+            print("Provded help text does not exist.")
 
         except Exception as e:
             messagebox.showerror(title="Error", message="An UI error occured. Please see log files for more details.")
             logging.error(str(e), exc_info=True)
+
+
+
+    # ***** EVENT HANDLERS *****
+
+    def browse_files_handler(self, filetypes:list):
+        try:
+            return FileOperator.browse_files(
+                filetypes=filetypes, 
+                title="Select File"
+            )
+        
+        except PathNoneError as e:
+            return None
+        
+        except Exception as e:
+            messagebox.showerror(title="Error", message="An error occured while retrieving the selected file. Please see log files for details.")
+            logging.error(msg=str(e), exc_info=True)
+    
+    def browse_saves_handler(self, filetypes:list, defaultextension:str, defaultname:str):
+
+        try:
+            return FileOperator.browse_save_files(
+                filetypes=filetypes, 
+                defaultextension=defaultextension, 
+                initialfile=defaultname, 
+                title="Save As"
+            )
+
+        except PathNoneError as e:
+            return None
+        
+        except Exception as e:
+            messagebox.showerror(title="Error", message="An error occured while retrieving the selected file. Please see log files for details.")
+            logging.error(msg=str(e), exc_info=True)
+    
+    def compress_handler(self):
+    
+        try:
+            self.file_manager.compress(self.compression_file_path.get(), self.compression_target_path.get())
+            self.reset_menu()
+        
+        except EncoderNoneError as e:
+            messagebox.showinfo(title="Information", message="You must open or create an encoder to compress a file. Please see the help menu for more information.")
+        
+        except PathNoneError as e:
+            messagebox.showerror(title="Error", message="Please provide a file to compress and a save file.")
+        
+        except Exception as e:
+            messagebox.showerror(title="Error", message="An error occured during compression. Please see log files for details.")
+            logging.error(msg=str(e), exc_info=True)
+    
+    def extract_handler(self):
+
+        try:
+            self.file_manager.extract(self.extraction_file_path.get(), self.extraction_target_path.get())
+            self.reset_menu()
+        
+        except EncoderNoneError as e:
+            messagebox.showinfo(title="Information", message="You must open or create the encoder that was used to compress the extracted file. Please see the help menu for more information.")
+            logging.error(msg=str(e), exc_info=True)
+
+        except PathNoneError as e:
+            messagebox.showerror(title="Error", message="Please provide a file to extract and a save file.")
+
+        except Exception as e:
+            messagebox.showerror(title="Error", message="An error occured during extraction. Please see log files for details.")
+            logging.error(msg=str(e), exc_info=True)
+
+    def display_character_info_handler(self, event) -> None:
+        """ Updates the character information frame of the statistics window when selecting a specific character.
+
+        Returns
+        -------
+        None
+        """
+
+        try:
+            # Get the current selection.
+            selection = self.listbox.curselection()
+
+            if not selection:
+                return None
+
+            # Get the data.
+            char = self.listbox.get(selection[0])
+            percentage = self.file_manager.encoder.char_percentages[char]
+            binary = self.file_manager.encoder.char_to_bin_index[char]
+
+            # Update the displayed string text.
+            self.info.config(text=f"Character: {char}\n Percentage of appearance: {percentage}\nBinary Encoding: {binary}")
+
+        except Exception as e:
+            messagebox.showerror(title="Error", 
+                                 message="An UI error occured. Please see log files for more details.")
+            logging.error(msg=str(e), exc_info=True)
+
+    def reset_menu(self) -> None:
+        """ Resets all entries in all menus to blank.  
+
+        Returns
+        -------
+        None
+        """
+
+        try:
+            self.compression_file_path.set("")
+            self.compression_target_path.set("")
+
+            self.extraction_file_path.set("")
+            self.extraction_target_path.set("")
+
+        except Exception as e:
+            messagebox.showerror(title="Error", 
+                                 message="An UI error occured. Please see log files for details.")
+            logging.error(msg=str(e), exc_info=True)
+
+
 
     # ***** Run *****
 
