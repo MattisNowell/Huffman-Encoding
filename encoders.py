@@ -8,7 +8,11 @@ class EncoderNoneError(Exception):
     def __init__(self, message = "Encoder value is None."):
         super().__init__(message)
 
-class Encoder(ABC):
+class Encoder(ABC):    
+
+    @abstractmethod
+    def init():
+        pass
 
     @abstractmethod
     def encode():
@@ -26,7 +30,7 @@ class Huffman(Encoder):
         self.char_to_bin_index = None
         self.bin_to_char_index = None
         if text is not None:
-            self.set_huffman(text=text)
+            self.init(text=text)
 
     @staticmethod
     def bit_to_byte(bin_string: str) -> bytes:
@@ -108,7 +112,7 @@ class Huffman(Encoder):
         # Return the percentage dictionnary sorted in ascending order:
         return dict(sorted(percentage_dict.items(), key=lambda x: x[1]))
 
-    def set_huffman(self, text:str) -> None:
+    def init(self, text:str) -> None:
         """Computes the Huffman tree data structure. For more details on the logic behind the Huffman tree, see: https://en.wikipedia.org/wiki/Huffman_coding   
 
         Parameters

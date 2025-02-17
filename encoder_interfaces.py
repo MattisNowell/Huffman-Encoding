@@ -43,7 +43,7 @@ class EncoderFileInterface(EncoderInterface):
         # Generate the new huffman tree.
         try:
             data = FileOperator.load(path)
-            self.encoder.set_huffman(data)
+            self.encoder.init(data)
             save_name = "untitled.json*"
             
             return save_name

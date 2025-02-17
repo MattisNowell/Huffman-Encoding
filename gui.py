@@ -102,11 +102,11 @@ class EncoderGUI():
 
             # Sub-Menu Buttons
             encoding.add_command(label="New Encoder",
-                                 command=lambda: self.save_name.set(self.file_manager.new_encoder()))
+                                 command=lambda: self.new_encoder_handler())
             encoding.add_command(label="Open Encoder",
-                                 command=lambda: self.save_name.set(self.file_manager.open_encoder()))
+                                 command=lambda: self.open_encoder_handler())
             encoding.add_command(label="Save As",
-                                 command=lambda: self.save_name.set(self.file_manager.save_encoder()))
+                                 command=lambda: self.save_encoder_handler())
 
             parameters.add_command(label="Encoding and Statistics", 
                                    command=self.encoding_stats)
@@ -152,7 +152,7 @@ class EncoderGUI():
             file_path_entry.config(state="readonly")
 
             browse_file_button = tk.Button(compression_tab, text="Select File", command=lambda: self.compression_file_path.set(self.browse_files_handler(filetypes=[("Text Files", "*.txt")])))
-    
+
             
             # COMPRESSION FOLDER ENTRY AND BROWSER
             self.compression_target_path = tk.StringVar()
@@ -370,6 +370,39 @@ class EncoderGUI():
         
         except Exception as e:
             messagebox.showerror(title="Error", message="An error occured while retrieving the selected file. Please see log files for details.")
+            logging.error(msg=str(e), exc_info=True)
+    
+    def new_encoder_handler(self):
+        try:
+            save = self.file_manager.new_encoder()
+            
+            if save is not None:
+                self.save_name.set(save)
+        
+        except Exception as e:
+            messagebox.showerror(title="Error", message="An error occured while creating a new encoder. Please see log files for details.")
+            logging.error(msg=str(e), exc_info=True)
+    
+    def open_encoder_handler(self):
+        try:
+            save = self.file_manager.open_encoder()
+
+            if save is not None:
+                self.save_name.set(save)
+        
+        except Exception as e:
+            messagebox.showerror(title="Error", message="An error occurred while opening an encoder. Please see log files for details.")
+            logging.error(msg=str(e), exc_info=True)
+
+    def save_encoder_handler(self):
+        try:
+            save = self.file_manager.save_encoder()
+
+            if save is not None:
+                self.save_name.set(save)
+
+        except Exception as e:
+            messagebox.showerror(title="Error", message="An error occurred while saving an encoder. Please see log files for details.")
             logging.error(msg=str(e), exc_info=True)
     
     def compress_handler(self):
