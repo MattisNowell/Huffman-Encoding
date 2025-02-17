@@ -1,21 +1,23 @@
 import tkinter as tk
-from encoder import Huffman
-from file_operations import FileOperator
+from encoders import Encoder, EncoderNoneError
+from file_operator import FileOperator, PathNoneError
 import os
+from abc import ABC, abstractmethod
 
-class EncoderInterface:
+
+class EncoderInterface(ABC):
     
+    @abstractmethod
     def compress(self):
         pass
 
+    @abstractmethod
     def extract(self):
         pass
 
-
-
 class EncoderFileInterface(EncoderInterface):
 
-    def __init__(self, encoder:Huffman):
+    def __init__(self, encoder:Encoder):
         self.encoder = encoder
 
         # ***** ENCODING MENU ACTIONS *****
@@ -32,10 +34,11 @@ class EncoderFileInterface(EncoderInterface):
         try:
             path = FileOperator.browse_files(title="Select File", filetypes=[("Text File", "*.txt")])
 
-            if path == None:
-                return None
-        except:
-            raise
+        except PathNoneError as e:
+            return None 
+        
+        except Exception as e:
+            raise e 
 
         # Generate the new huffman tree.
         try:
@@ -44,10 +47,11 @@ class EncoderFileInterface(EncoderInterface):
             save_name = "untitled.json*"
             
             return save_name
+        
         except Exception as e:
-            raise
+            raise e
 
-    def open_encoder(self, manual_path:str = None) -> None:
+    def open_encoder(self, path:str = None) -> None:
         """ 
 
         Returns
@@ -57,16 +61,14 @@ class EncoderFileInterface(EncoderInterface):
 
         # Ask the user for the huffman tree json save.
         try:
-            if manual_path == None:             
+            if path == None:             
                 path = FileOperator.browse_files(title="Open File", filetypes=[("JSON File", "*.json")])
-                if path == None:
-                    return None
-            else:
-                path = manual_path
+        
+        except PathNoneError as e:
+            return None 
 
         except Exception as e:
-            print(str(e))
-            raise
+            raise e
 
         # Load the save into the encoder.
         try:
@@ -80,7 +82,7 @@ class EncoderFileInterface(EncoderInterface):
             return save_name
         
         except Exception as e:
-            raise
+            raise e
 
     def save_encoder(self) -> None:
         """ Saves the currently loaded huffman encoding to the target path.
@@ -96,11 +98,12 @@ class EncoderFileInterface(EncoderInterface):
                                                   defaultextension=".json", 
                                                   filetypes=[("JSON File", "*.json")],
                                                   initialfile="untitled")
-            if path == None:
-                return None
             
+        except PathNoneError as e:
+            return None
+        
         except Exception as e:
-            raise
+            raise e
 
         # Save the huffman encoding in the directory as a json file.
         try:
@@ -115,7 +118,7 @@ class EncoderFileInterface(EncoderInterface):
             return save_name
 
         except Exception as e:
-            raise
+            raise e
 
     # ***** COMPRESS AND EXTRACT ACTIONS *****
 
@@ -129,12 +132,10 @@ class EncoderFileInterface(EncoderInterface):
         """
 
         # Get text file to compress and compress.
-        if self.encoder.char_to_bin_index == None:
-            raise
-        elif not file_path:
-            raise
-        elif not save_path:
-            raise
+        
+        if not file_path or not save_path:
+            raise PathNoneError
+        
         else:
             try:
                 # Compress file.
@@ -145,9 +146,7 @@ class EncoderFileInterface(EncoderInterface):
                 FileOperator.save(save_path, compressed)
 
             except Exception as e:
-                raise
-
-        return None
+                raise e
 
     def extract(self, file_path:str, save_path:str) -> int:
         """ Gets the file to extract and extracts it to the directory file. 
@@ -158,12 +157,9 @@ class EncoderFileInterface(EncoderInterface):
             Error code with 0 being successful and 1 pointing to an error.
         """
 
-        if self.encoder.char_to_bin_index == None:
-            raise
-        elif not file_path:
-            raise
-        elif not save_path:
-            raise
+        if not file_path or not save_path:
+            raise PathNoneError
+        
         else:
             try:
                 # Exract file.
@@ -172,8 +168,6 @@ class EncoderFileInterface(EncoderInterface):
 
                 # Save to target path.
                 FileOperator.save(save_path, extracted)
-    
-            except Exception as e:
-                raise
 
-        return None
+            except Exception as e:
+                raise e

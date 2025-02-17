@@ -2,6 +2,15 @@ from tkinter import filedialog
 import json, os
 from typing import Optional, Union
 
+class PathNoneError(Exception):
+
+    def __init__(self, message="The path is of type None"):
+        super().__init__(message)
+
+class FileTypeError(Exception):
+
+    def __init__(self, message="The file type is not recognised or handled"):
+        super().__init__(message)
 
 class FileOperator:
 
@@ -26,13 +35,13 @@ class FileOperator:
         try:
             path = filedialog.askopenfilename(title=title, filetypes=filetypes)
 
-            if path and os.path.exists(path):
+            if path:
                 return path
             
-            return None
+            raise PathNoneError()
             
         except Exception as e:
-            raise
+            raise e
 
     @staticmethod
     def browse_save_files(title:str = '', defaultextension:str = ".json", initialfile:str = "untitled.bin", filetypes:list = []) -> Optional[str]:
@@ -57,11 +66,13 @@ class FileOperator:
                                                 defaultextension=defaultextension, 
                                                 initialfile=initialfile, 
                                                 filetypes=filetypes)
-            return path
+            if path:
+                return path
+        
+            raise PathNoneError()
 
         except Exception as e:
-            print(str(e))
-            raise
+            raise e
 
     @staticmethod
     def browse_directories(title:str = '') -> Optional[str]:
@@ -85,10 +96,10 @@ class FileOperator:
             if path:
                 return path
 
-            return None
+            raise PathNoneError()
 
         except Exception as e:
-            raise
+            raise e
 
     @staticmethod
     def save(path:str, data:list) -> None:
@@ -106,6 +117,7 @@ class FileOperator:
         """
 
         try:
+
             file_extension = path.split('.')[-1].lower()
 
             if file_extension == "txt":
@@ -121,10 +133,10 @@ class FileOperator:
                     json.dump(data, file)
 
             else:
-                raise 
+                raise FileTypeError()
         
-        except:
-            raise
+        except Exception as e:
+            raise e
 
     @staticmethod
     def load(path:str) -> Union[str, bytes, list]:
@@ -142,10 +154,9 @@ class FileOperator:
         """
         try:
             if not os.path.exists(path):
-                raise 
+                raise FileNotFoundError()
             
             data = None
-                
             file_extension = path.split('.')[-1].lower()
 
             if file_extension == "txt":
@@ -161,9 +172,9 @@ class FileOperator:
                     data = json.load(file)
 
             else:
-                raise 
+                raise FileTypeError()
             
             return data 
         
-        except:
-            raise
+        except Exception as e:
+            raise e
