@@ -49,6 +49,8 @@ class EncoderGUI():
             except Exception as e:
                 messagebox.showerror(title="Error", message="The provided default file failed to load. Please see log files for details.")
                 logging.error(msg=str(e), exc_info=True)
+            
+            self.root.protocol("WM_DELETE_WINDOW", self.close_handler)
 
             # Notebooks allow for multiple tabs within the app.
             self.notebook = ttk.Notebook(self.root)
@@ -76,7 +78,6 @@ class EncoderGUI():
         except Exception as e:
             messagebox.showerror(title="Error", message=f"The system failed to load. {str(e)}")       
             print(str(e))
-
 
     def global_error_handler(self, exctype, value, traceback):
         logging.error("Uncaught Exception", exc_info=(
@@ -390,6 +391,22 @@ class EncoderGUI():
 
 
     # ***** EVENT HANDLERS *****
+
+    def close_handler(self):
+        if self.save_name.get() == "untitled.json*":
+            save_changes = tk.messagebox.askyesnocancel("Save Encoder", "Do you want to save the encoder before exiting? Loosing your encoder might mean you will not be able to extract any compressed file.")
+
+            if save_changes is None:
+                return 
+            
+            elif save_changes == False:
+                self.root.destroy()
+
+            else:
+                self.file_manager.save_encoder()
+
+        else:
+            self.root.destroy()
 
     def browse_files_handler(self, filetypes:list):
         try:
