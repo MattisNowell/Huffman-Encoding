@@ -1,5 +1,5 @@
 from collections import Counter
-from node import Node
+from node import Leaf, Inner
 import string
 from abc import ABC, abstractmethod
 
@@ -123,10 +123,10 @@ class Huffman(Encoder):
 
         # Huffman Tree: 
         self.char_percentages = Huffman.get_char_percentages(text, fill=True)
-        nodes = list([Node(character=char, probability=self.char_percentages[char]) for char in self.char_percentages])
+        nodes = list([Leaf(char=char, probability=self.char_percentages[char]) for char in self.char_percentages])
 
         while len(nodes) > 1:
-            nodes.append(Node(nodes[0], nodes[1]))
+            nodes.append(Inner(first_child_node=nodes[0], second_child_node=nodes[1]))
             nodes = sorted(nodes[2::], key=lambda x: x.probability)
         self.root = nodes[0]
 
@@ -138,7 +138,7 @@ class Huffman(Encoder):
                 char_to_bin = ''
                 current_node = self.root
                 # As long as base leaf not reached:
-                while len(current_node.chars) != 1:
+                while isinstance(current_node, Inner):
                     # Follow tree down and add binary path.
                     if char in current_node.first_child_node.chars:
                         current_node = current_node.first_child_node
@@ -209,3 +209,6 @@ class Huffman(Encoder):
         return text
     
     
+if __name__ == "__main__":
+    huffman = Huffman("jjjjjjjjjjjjjdddddddddd")
+    print(huffman.char_to_bin_index)

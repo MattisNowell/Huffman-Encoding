@@ -82,7 +82,7 @@ class EncoderGUI():
         logging.error("Uncaught Exception", exc_info=(
             exctype, value, traceback))
         
-        
+
 
     # ***** MAIN MENUS *****
 
@@ -427,6 +427,7 @@ class EncoderGUI():
         try:
             self.file_manager.compress(self.compression_file_path.get(), self.compression_target_path.get())
             self.reset_menu()
+            messagebox.showinfo(title="Information", message="File successfully compressed.")
         
         except EncoderNoneError as e:
             messagebox.showinfo(title="Information", message="You must open or create an encoder to compress a file. Please see the help menu for more information.")
@@ -443,6 +444,7 @@ class EncoderGUI():
         try:
             self.file_manager.extract(self.extraction_file_path.get(), self.extraction_target_path.get())
             self.reset_menu()
+            messagebox.showinfo(title="Information", message="File successfully extracted.")
         
         except EncoderNoneError as e:
             messagebox.showinfo(title="Information", message="You must open or create the encoder that was used to compress the extracted file. Please see the help menu for more information.")
