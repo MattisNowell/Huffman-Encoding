@@ -110,8 +110,6 @@ class EncoderGUI():
 
             parameters.add_command(label="Encoding and Statistics", 
                                    command=self.encoding_stats)
-            parameters.add_command(label="Settings", 
-                                   command=self.settings)
             parameters.add_command(label="Help", 
                                    command=self.help)
             parameters.add_separator()
@@ -284,71 +282,6 @@ class EncoderGUI():
             messagebox.showerror(title="Error", 
                                  message="An UI error occured. Please see log files for more details.")
             logging.error(msg=str(e), exc_info=True)
-
-    def settings(self) -> None:
-        """ Creates a new window to allow for in-app settings modification. 
-
-        Returns
-        -------
-        None
-        """
-
-        try:
-            # Create the new window.
-            settings_window = tk.Toplevel(self.root)
-            settings_window.title("Help")
-
-            # Default Save setting UI:
-            default_save_label = tk.Label(settings_window, text="Default Save Folder: ")
-
-            self.default_saving_dir_path = tk.StringVar()
-            save_path_entry = tk.Entry(settings_window, textvariable=self.default_saving_dir_path, width=50)
-            save_path_entry.config(state="readonly")
-
-            try:
-                browse_save = lambda: self.default_saving_dir_path.set(FileOperator.browse_directories( 
-                    "Select Folder"
-                ))
-                browse_save_button = tk.Button(settings_window, text="Select Default Save Folder", command=browse_save)
-            
-            except Exception as e:
-                pass
-
-            # Default Encoder setting UI:
-            default_encoder_label = tk.Label(settings_window, text="Default Encoder File: ")
-
-            self.default_encoding_file_path = tk.StringVar()
-            encoder_path_entry = tk.Entry(settings_window, textvariable=self.default_encoding_file_path, width=50)
-            encoder_path_entry.config(state="readonly")
-
-            try:
-                browse_encoder = lambda: self.default_encoding_file_path.set(FileOperator.browse_files(
-                    [("Binary Files", "*.bin")], 
-                    "Select File"
-                ))
-                browse_encoder_button = tk.Button(settings_window, text="Select Default Encoder File", command=browse_encoder)
-            
-            except Exception as e:
-                pass
-
-            # Close window UI:
-            save_close_button = tk.Button(settings_window, text="Save and Close", command=settings_window.destroy)
-
-            cancel_button = tk.Button(settings_window, text="Cancel", command=settings_window.destroy)
-
-            # Widget positions.
-            default_save_label.grid(row=0, column=0, padx=10, pady=10)
-            save_path_entry.grid(row=0, column=1, padx=10, pady=10)
-            browse_save_button.grid(row=1, column=0, padx=10, pady=10)
-            default_encoder_label.grid(row=2, column=0, padx=10, pady=10)
-            encoder_path_entry.grid(row=2, column=1, padx=10, pady=10)
-            browse_encoder_button.grid(row=3, column=0, padx=10, pady=10)
-            save_close_button.grid(row=4, column=1, padx=10, pady=10)
-            cancel_button.grid(row=4, column=0, padx=10, pady=10)
-
-        except Exception as e:
-            messagebox.showerror(title="Error", message="An UI error occured. Please see log files for more details.")
-            logging.error(str(e), exc_info=True)
 
     def help(self) -> None:
         """ Creates a new window with the help information.

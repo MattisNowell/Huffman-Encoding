@@ -1,0 +1,67 @@
+2025-02-17 16:21:51,022 - ERROR - 'EncoderGUI' object has no attribute 'custom_saving_dir_path'
+Traceback (most recent call last):
+  File "D:\Huffman-Encoding\gui.py", line 316, in settings
+    save_path_entry = tk.Entry(settings_window, textvariable=self.custom_saving_dir_path, width=50)
+                                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'EncoderGUI' object has no attribute 'custom_saving_dir_path'. Did you mean: 'default_saving_dir_path'?
+2025-02-17 16:23:37,627 - ERROR - Uncaught Exception
+Traceback (most recent call last):
+  File "D:\Huffman-Encoding\main.py", line 7, in <module>
+    gui.run()
+  File "D:\Huffman-Encoding\gui.py", line 556, in run
+    self.root.mainloop()
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.12_3.12.2544.0_x64__qbz5n2kfra8p0\Lib\tkinter\__init__.py", line 1505, in mainloop
+    self.tk.mainloop(n)
+KeyboardInterrupt
+2025-02-17 16:23:43,530 - ERROR - 'EncoderGUI' object has no attribute 'default_encoding_file_path'
+Traceback (most recent call last):
+  File "D:\Huffman-Encoding\gui.py", line 325, in settings
+    encoder_path_entry = tk.Entry(settings_window, textvariable=self.default_encoding_file_path, width=50)
+                                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'EncoderGUI' object has no attribute 'default_encoding_file_path'. Did you mean: 'custom_encoding_file_path'?
+2025-02-17 16:24:14,209 - ERROR - Uncaught Exception
+Traceback (most recent call last):
+  File "D:\Huffman-Encoding\main.py", line 7, in <module>
+    gui.run()
+  File "D:\Huffman-Encoding\gui.py", line 556, in run
+    self.root.mainloop()
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.12_3.12.2544.0_x64__qbz5n2kfra8p0\Lib\tkinter\__init__.py", line 1505, in mainloop
+    self.tk.mainloop(n)
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.12_3.12.2544.0_x64__qbz5n2kfra8p0\Lib\tkinter\__init__.py", line 1963, in __call__
+    def __call__(self, *args):
+    
+KeyboardInterrupt
+2025-02-17 16:26:49,521 - ERROR - Uncaught Exception
+Traceback (most recent call last):
+  File "D:\Huffman-Encoding\main.py", line 7, in <module>
+    gui.run()
+  File "D:\Huffman-Encoding\gui.py", line 556, in run
+    self.root.mainloop()
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.12_3.12.2544.0_x64__qbz5n2kfra8p0\Lib\tkinter\__init__.py", line 1505, in mainloop
+    self.tk.mainloop(n)
+KeyboardInterrupt
+2025-02-17 16:28:55,384 - ERROR - Uncaught Exception
+Traceback (most recent call last):
+  File "D:\Huffman-Encoding\main.py", line 7, in <module>
+    gui.run()
+  File "D:\Huffman-Encoding\gui.py", line 556, in run
+    self.root.mainloop()
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.12_3.12.2544.0_x64__qbz5n2kfra8p0\Lib\tkinter\__init__.py", line 1505, in mainloop
+    self.tk.mainloop(n)
+KeyboardInterrupt
+2025-02-17 16:33:13,342 - ERROR - Uncaught Exception
+Traceback (most recent call last):
+  File "D:\Huffman-Encoding\main.py", line 7, in <module>
+    gui.run()
+  File "D:\Huffman-Encoding\gui.py", line 556, in run
+    self.root.mainloop()
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.12_3.12.2544.0_x64__qbz5n2kfra8p0\Lib\tkinter\__init__.py", line 1505, in mainloop
+    self.tk.mainloop(n)
+KeyboardInterrupt
+2025-02-17 16:54:50,249 - ERROR - Uncaught Exception
+Traceback (most recent call last):
+  File "D:\Huffman-Encoding\main.py", line 7, in <module>
+  File "D:\Huffman-Encoding\gui.py", line 568, in run
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.12_3.12.2544.0_x64__qbz5n2kfra8p0\Lib\tkinter\__init__.py", line 1505, in mainloop
+    self.tk.mainloop(n)
+KeyboardInterrupt
