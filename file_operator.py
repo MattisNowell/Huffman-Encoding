@@ -3,16 +3,59 @@ import json, os
 from typing import Optional, Union
 
 class PathNoneError(Exception):
+    """ Exception raised when a path is of type None.
+
+    Attributes
+    ----------
+    None
+
+    Methods
+    -------
+    None
+    """
 
     def __init__(self, message="The path is of type None"):
+        """ Initializes the PathNoneError class.
+        """
         super().__init__(message)
 
 class FileTypeError(Exception):
+    """ Exception raised when the file type is not recognised or handled.
+
+    Attributes
+    ----------
+    None
+
+    Methods
+    -------
+    None
+    """
 
     def __init__(self, message="The file type is not recognised or handled"):
+        """ Initializes the FileTypeError class.
+        """
         super().__init__(message)
 
 class FileOperator:
+    """ Class to handle file operations such as saving, loading, and browsing files.
+
+    Attributes
+    ----------
+    None
+
+    Methods
+    -------
+    browse_files(title:str = '', filetypes:list = []) -> Optional[str]
+        Get an input from the user to select a file.
+    browse_save_files(title:str = '', defaultextension:str = ".json", initialfile:str = "untitled.bin", filetypes:list = []) -> Optional[str]
+        Get an input from the user to select a file.
+    browse_directories(title:str = '') -> Optional[str]
+        Get an input from the user to select a folder.
+    save(path:str, data:Union[str, bytes, list]) -> None
+        Saves a given data into a specified file.
+    load(path:str) -> Union[str, bytes, list]  
+        Load data from a specified file.
+    """
 
     @staticmethod
     def browse_files(title:str = '', filetypes:list = []) -> Optional[str]:
@@ -20,16 +63,15 @@ class FileOperator:
 
         Parameters
         ----------
-        path : tk.StringVar
-            String variable class from the tkinter chosen to contain the user-selected path.
+        title: str
+            Title to be displayed in the file explorer.
         filetype: list 
             List of tuple descriptions of the file types to be constrained to in the file explorer.
-        title:
-            Title to be displayed in the file explorer.
 
         Returns
         -------
-        None
+        Optional[str] 
+            The path to the file selected by the user.
         """
 
         try:
@@ -49,16 +91,19 @@ class FileOperator:
 
         Parameters
         ----------
-        path : tk.StringVar
-            String variable class from the tkinter chosen to contain the user-selected path.
-        filetype: list 
-            List of tuple descriptions of the file types to be constrained to in the file explorer.
         title:
             Title to be displayed in the file explorer.
+        defaultextension: str
+            Default extension to be used for the file.
+        initialfile: str
+            Initial file name to be displayed in the file explorer.
+        filetype: list 
+            List of tuple descriptions of the file types to be constrained to in the file explorer.
 
         Returns
         -------
-        None
+        Optional[str]
+            The path to the file selected by the user.
         """
 
         try:
@@ -80,14 +125,13 @@ class FileOperator:
 
         Parameters
         ----------     
-        path : tk.StringVar
-            String variable class from the tkinter chosen to contain the user-selected path.
         title:
             Title to be displayed in the file explorer.
 
         Returns
         -------
-        None
+        Optional[str] 
+            The path to the folder selected by the user.
         """
 
         try:
@@ -102,18 +146,20 @@ class FileOperator:
             raise e
 
     @staticmethod
-    def save(path:str, data:list) -> None:
-        """ Saves the object's huffman tree parameters from a specified JSON file.
+    def save(path:str, data:Union[str, bytes, list]) -> None:
+        """ Saves a given data into a specified file.
 
         Parameters
         ----------
         path : str
-            Text string to represents a path to the file to save the JSON Huffman tree parameters into.
+            Text string to represents a path to the file to save the data to.
+        data : Union[str, bytes, list]
+            Data to be saved.
+            
 
         Returns
         -------
-        str
-            An error message.
+        None
         """
 
         try:
@@ -140,17 +186,17 @@ class FileOperator:
 
     @staticmethod
     def load(path:str) -> Union[str, bytes, list]:
-        """ Loads existing huffman tree parameters from a specified JSON file.
+        """ Load data from a specified file.
 
         Parameters
         ----------
         path : str
-            Text string to represents a path to the file to load the JSON Huffman tree parameters from.
+            Text string to represents a path to the file to load the data from.
 
         Returns
         -------
-        str
-            An error message.
+        Union[str, bytes, list]
+            Data loaded from the file.
         """
         try:
             if not os.path.exists(path):
