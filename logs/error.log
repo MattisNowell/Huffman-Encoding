@@ -65,3 +65,11 @@ Traceback (most recent call last):
   File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.12_3.12.2544.0_x64__qbz5n2kfra8p0\Lib\tkinter\__init__.py", line 1505, in mainloop
     self.tk.mainloop(n)
 KeyboardInterrupt
+2025-02-18 01:50:26,386 - ERROR - Uncaught Exception
+Traceback (most recent call last):
+  File "D:\Huffman-Encoding\main.py", line 6, in <module>
+    gui.run()
+  File "D:\Huffman-Encoding\gui.py", line 700, in run
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.12_3.12.2544.0_x64__qbz5n2kfra8p0\Lib\tkinter\__init__.py", line 1505, in mainloop
+    self.tk.mainloop(n)
+KeyboardInterrupt
