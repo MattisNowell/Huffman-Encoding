@@ -407,6 +407,8 @@ class EncoderGUI():
 
             help_label = tk.Label(help_window, text=help_text)
 
+            help_label.pack(padx=10, pady=10)
+
             # Close Button
             close_button = tk.Button(help_window, text="Close", command=help_window.destroy)
 

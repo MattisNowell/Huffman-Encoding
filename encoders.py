@@ -90,7 +90,7 @@ class Huffman(Encoder):
         Decodes the given byte array into a character string following the Huffman coding method.
     """
 
-    def __init__(self, text:Optional[str]) -> None:
+    def __init__(self, text:Optional[str]=None) -> None:
         """Initializes the Huffman encoder.
         
         Parameters
