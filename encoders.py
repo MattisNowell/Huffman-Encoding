@@ -1,32 +1,108 @@
 from collections import Counter
-from node import Leaf, Inner
 import string
 from abc import ABC, abstractmethod
+from typing import Optional
+
+from node import Leaf, Inner
 
 class EncoderNoneError(Exception):
+    """ Exception raised when the encoder value is None. 
+    
+    Attributes
+    ----------
+    None
+
+    Methods
+    -------
+    None
+    """
 
     def __init__(self, message = "Encoder value is None."):
+        """ Initializes the EncoderNoneError class.
+        """
         super().__init__(message)
 
 class Encoder(ABC):    
+    """ Abstract class to represent an encoder.
+    
+    Attributes
+    ----------
+    None
+    
+    Methods
+    -------
+    init() -> None
+        Initializes the encoder.
+        
+    encode() -> None
+        Encodes a file.
+    
+    decode() -> None
+        Decodes a file.
+    """
 
     @abstractmethod
-    def init():
+    def init(self):
+        """ Initializes the encoder.
+        """
         pass
 
     @abstractmethod
-    def encode():
+    def encode(self):
+        """ Encodes a file.
+
+        """
         pass
 
     @abstractmethod
-    def decode():
+    def decode(self):
+        """ Decodes a file.
+        """
         pass
 
 class Huffman(Encoder):
-    """ 
+    """ Class to represent a Huffman encoder.
+
+    Attributes
+    ----------
+    char_to_bin_index : dict
+        A dictionary that maps characters to their binary representation.
+    bin_to_char_index : dict
+        A dictionary that maps binary values to their corresponding characters.
+    char_percentages : dict
+        A dictionary that maps characters to their percentage of appearance in the text.
+    root : Inner
+        The root node of the Huffman tree.
+    
+    Methods
+    -------
+    bit_to_byte(bin_string:str) -> bytes
+        Converts a string type variable that contains a sequence of bits into a bytes type variable that contains the corresponding byte representation.
+    byte_to_bit(byte_content:bytes) -> str
+        Converts a list type variable that contains a sequence of bytes into a string type variable that contains the corresponding bit representation.
+    get_char_percentages(text:str, fill:bool=False) -> dict
+        Calculates the percentage of appearance of each character in the given text file.
+    init(text:str) -> None
+        Computes the Huffman tree data structure.
+    encode(text:str) -> bytearray
+        Encodes the given text file into a byte array following the Huffman Encoding method.
+    decode(byte_content:bytes) -> str
+        Decodes the given byte array into a character string following the Huffman coding method.
     """
 
-    def __init__(self, text:str=None) -> None:
+    def __init__(self, text:Optional[str]) -> None:
+        """Initializes the Huffman encoder.
+        
+        Parameters
+        ----------
+        text : str
+            Text to generate the huffman tree from.
+        
+        Returns
+        -------
+        None
+        """
+
         self.char_to_bin_index = None
         self.bin_to_char_index = None
         if text is not None:
@@ -211,8 +287,3 @@ class Huffman(Encoder):
             right += 1
         
         return text
-    
-    
-if __name__ == "__main__":
-    huffman = Huffman("jjjjjjjjjjjjjdddddddddd")
-    print(huffman.char_to_bin_index)

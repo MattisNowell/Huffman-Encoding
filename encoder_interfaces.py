@@ -1,33 +1,77 @@
-import tkinter as tk
-from encoders import Encoder, EncoderNoneError
-from file_operator import FileOperator, PathNoneError
 import os
+from typing import Optional
 from abc import ABC, abstractmethod
+
+from encoders import Encoder
+from file_operator import FileOperator, PathNoneError
 
 
 class EncoderInterface(ABC):
-    
+    """ Abstract class to represent an interface between a user and an encoder.
+
+    Attributes
+    ----------
+    None 
+
+    Methods
+    -------
+    compress() -> None
+        Compresses a file.
+
+    extract() -> None
+        Extracts a file.
+    """
+
     @abstractmethod
     def compress(self):
+        """ Compresses a file.
+        """
         pass
 
     @abstractmethod
     def extract(self):
+        """ Extracts a file.
+        """
         pass
 
 class EncoderFileInterface(EncoderInterface):
+    """ Class to represent an interface between a user and an encoder through file operations.
+
+    Attributes
+    ----------
+    encoder: Encoder
+        The encoder to interface with.
+    
+    Methods
+    -------
+    new_encoder() -> Optional[str]
+        Generates a new encoder for future compressions and extractions.
+    open_encoder(path:Optional[str]) -> Optional[str]
+        Opens an encoder from a json file.
+    save_encoder() -> Optional[str]
+        Saves the currently opened encoding to a json file.
+    compress(file_path:str, save_path:str) -> None
+        Compresses a file and saves it to a target file.
+    extract(file_path:str, save_path:str) -> None
+        Extracts a file and saves it to a target file.
+    """
 
     def __init__(self, encoder:Encoder):
         self.encoder = encoder
 
         # ***** ENCODING MENU ACTIONS *****
 
-    def new_encoder(self) -> None:
+    def new_encoder(self) -> Optional[str]:
         """ Generates a new huffman tree and a new corresponding binary encoding for future compressions and extractions.
+
+        Parameters
+        ----------
+        None
 
         Returns
         -------
-        None
+        Optional[str]
+            The name of the generated encoding file.
         """
 
         # Ask the user for a text file from which generate the new huffman tree.
@@ -51,12 +95,18 @@ class EncoderFileInterface(EncoderInterface):
         except Exception as e:
             raise e
 
-    def open_encoder(self, path:str = None) -> None:
-        """ 
+    def open_encoder(self, path:Optional[str] = None) -> Optional[str]:
+        """ Opens an encoder from a json file.
+
+        Parameters
+        ----------
+        path: Optional[str]
+            The path to the json file to open.
 
         Returns
         -------
-        None
+        Optional[str]
+            The name of the opened encoding file.
         """
 
         # Ask the user for the huffman tree json save.
@@ -84,12 +134,17 @@ class EncoderFileInterface(EncoderInterface):
         except Exception as e:
             raise e
 
-    def save_encoder(self) -> None:
-        """ Saves the currently loaded huffman encoding to the target path.
+    def save_encoder(self) -> Optional[str]:
+        """ Saves the currently opened encoding to a json file.
+
+        Parameters
+        ----------
+        None
 
         Returns
         -------
-        None
+        Optional[str]
+            The name of the saved encoding file.
         """
 
         # Ask the user for the directory in which to save the huffman tree json file.
@@ -123,12 +178,18 @@ class EncoderFileInterface(EncoderInterface):
     # ***** COMPRESS AND EXTRACT ACTIONS *****
 
     def compress(self, file_path:str, save_path:str) -> None:
-        """ Gets the file to compress and compresses it to the directory file. 
+        """ Compresses a file and saves it to a target file.
+
+        Parameters
+        ----------
+        file_path: str
+            The path to the file to compress.
+        save_path: str
+            The path to the directory to save the compressed file.
 
         Returns
         -------
-        int
-            Error code with 0 being successful and 1 pointing to an error.
+        None
         """
 
         # Get text file to compress and compress.
@@ -148,13 +209,19 @@ class EncoderFileInterface(EncoderInterface):
             except Exception as e:
                 raise e
 
-    def extract(self, file_path:str, save_path:str) -> int:
-        """ Gets the file to extract and extracts it to the directory file. 
+    def extract(self, file_path:str, save_path:str) -> None:
+        """ Extracts a file and saves it to a target file.
+
+        Parameters
+        ----------
+        file_path: str
+            The path to the file to extract.
+        save_path: str
+            The path to the directory to save the extracted file.
 
         Returns
         -------
-        int
-            Error code with 0 being successful and 1 pointing to an error.
+        None
         """
 
         if not file_path or not save_path:

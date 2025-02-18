@@ -1,14 +1,90 @@
+import os, logging, sys
+from typing import Optional
 import tkinter as tk
 from tkinter import messagebox, ttk
-from encoders import Huffman
-from encoder_interfaces import EncoderFileInterface, EncoderNoneError
+
+from encoders import Huffman, EncoderNoneError
+from encoder_interfaces import EncoderFileInterface
 from file_operator import FileOperator, FileTypeError, PathNoneError
-import os, logging, sys
 
 
 class EncoderGUI():
+    """ Class to handle the GUI for the encoder application.
+
+    Attributes
+    ----------
+    root : tk.Tk
+        The main window of the GUI.
+    notebook : ttk.Notebook
+        The notebook to handle multiple tabs within the GUI.
+    file_manager : EncoderFileInterface
+        The file manager to handle the encoder.
+    save_name : tk.StringVar
+        The name of the current encoder file.
+    compression_file_path : tk.StringVar
+        The path to the file to be compressed.
+    compression_target_path : tk.StringVar
+        The path to the compressed file.
+    extraction_file_path : tk.StringVar
+        The path to the file to be extracted.
+    extraction_target_path : tk.StringVar
+        The path to the extracted file.
+    listbox : tk.Listbox
+        The listbox to display the characters of the encoding.
+    info : tk.Label
+        The label to display the character information.
+    
+    Methods
+    -------
+    global_error_handler(exctype:type, value:Exception, traceback:traceback) -> None
+        Global error handler for the GUI application.
+    top_menu() -> None
+        Sets all the widgets for the top bar menu.
+    compression_menu() -> None
+        Sets all the widgets for the compression menu.
+    extraction_menu() -> None
+        Sets all the widgets for the extraction menu.
+    encoding_stats() -> None
+        Sets all the widgets for a menu to display the current encoding's statistics.
+    help() -> None
+        Sets all the widgets for a help menu.
+    close_handler() -> None
+        Handles event calls for the closing of the application.
+    browse_files_handler(filetypes:list) -> Optional[str]
+        Handles event calls for the browsing of files.
+    browse_saves_handler(filetypes:list, defaultextension:str, defaultname:str)
+        Handles event calls for the browsing and creation of save files.
+    new_encoder_handler() -> Optional[str]
+        Handles event calls for the creation of a new encoder.
+    open_encoder_handler() -> Optional[str]
+        Handles event calls for the opening of an encoder.
+    save_encoder_handler() -> Optional[str]
+        Handles event calls for the saving of an encoder.
+    compress_handler() -> None
+        Handles event calls for the compression of a file.
+    extract_handler() -> None
+        Handles event calls for the extraction of a file.
+    display_character_info_handler(event:tk.Event) -> None
+        Updates the character information frame of the statistics window when selecting a specific character.
+    reset_menu() -> None
+        Resets entries to all menus to none.
+    run() -> None
+        Runs the GUI application.
+    
+    """
 
     def __init__(self, encoder:Huffman):
+        """ Initialises the GUI for the encoder.
+        
+        Parameters
+        ----------
+        encoder : Huffman
+            The encoder to be used by the GUI.
+        
+        Returns
+        -------
+        None
+        """
 
         self.root = tk.Tk()
         self.root.title("Compressor")
@@ -79,9 +155,24 @@ class EncoderGUI():
             messagebox.showerror(title="Error", message=f"The system failed to load. {str(e)}")       
             print(str(e))
 
-    def global_error_handler(self, exctype, value, traceback):
-        logging.error("Uncaught Exception", exc_info=(
-            exctype, value, traceback))
+    def global_error_handler(self, exctype, value, traceback) -> None:
+        """ Global error handler for the GUI application.
+
+        Parameters
+        ----------
+        exctype : type
+            The type of the exception.
+        value : Exception
+            The exception that was raised.
+        traceback : traceback
+            The traceback of the exception.
+        
+        Returns
+        -------
+        None
+        """
+
+        logging.error("Uncaught Exception", exc_info=(exctype, value, traceback))
         
 
 
@@ -89,6 +180,10 @@ class EncoderGUI():
 
     def top_menu(self) -> None:
         """ Sets all the widgets for the top bar menu.  
+
+        Parameters
+        ----------
+        None
 
         Returns
         -------
@@ -101,26 +196,18 @@ class EncoderGUI():
             parameters = tk.Menu(bar)
 
             # Sub-Menu Buttons
-            encoding.add_command(label="New Encoder",
-                                 command=lambda: self.new_encoder_handler())
-            encoding.add_command(label="Open Encoder",
-                                 command=lambda: self.open_encoder_handler())
-            encoding.add_command(label="Save As",
-                                 command=lambda: self.save_encoder_handler())
+            encoding.add_command(label="New Encoder", command=lambda: self.save_name.set(self.new_encoder_handler()))
+            encoding.add_command(label="Open Encoder", command=lambda: self.save_name.set(self.open_encoder_handler()))
+            encoding.add_command(label="Save As",command=lambda: self.save_name.set(self.save_encoder_handler()))
 
-            parameters.add_command(label="Encoding and Statistics", 
-                                   command=self.encoding_stats)
-            parameters.add_command(label="Help", 
-                                   command=self.help)
+            parameters.add_command(label="Encoding and Statistics", command=self.encoding_stats)
+            parameters.add_command(label="Help", command=self.help)
             parameters.add_separator()
-            parameters.add_command(label="Exit", 
-                                   command=self.root.quit)
+            parameters.add_command(label="Exit", command=self.root.quit)
 
             # Menu Button
-            bar.add_cascade(label="Encoder", 
-                            menu=encoding)
-            bar.add_cascade(label="Parameters", 
-                            menu=parameters)
+            bar.add_cascade(label="Encoder", menu=encoding)
+            bar.add_cascade(label="Parameters", menu=parameters)
 
             self.root.config(menu=bar)
 
@@ -130,6 +217,10 @@ class EncoderGUI():
 
     def compression_menu(self) -> None:
         """ Sets all the widgets for the compression menu.  
+
+        Parameters
+        ----------
+        None
 
         Returns
         -------
@@ -184,6 +275,10 @@ class EncoderGUI():
     def extraction_menu(self) -> None:
         """ Sets all the widgets for the extraction menu.  
 
+        Parameters
+        ----------
+        None
+
         Returns
         -------
         None
@@ -237,7 +332,11 @@ class EncoderGUI():
     # ***** SETTINGS MENUS *****
 
     def encoding_stats(self) -> None:
-        """ Creates a new window with the current huffman tree's statistics and binary encoding information. 
+        """ Sets all the widgets for a menu to display the current encoding's statistics. 
+
+        Parameters
+        ----------
+        None
 
         Returns
         -------
@@ -284,7 +383,11 @@ class EncoderGUI():
             logging.error(msg=str(e), exc_info=True)
 
     def help(self) -> None:
-        """ Creates a new window with the help information.
+        """ Sets all the widgets for a help menu.
+
+        Parameters
+        ----------
+        None
 
         Returns
         -------
@@ -326,6 +429,17 @@ class EncoderGUI():
     # ***** EVENT HANDLERS *****
 
     def close_handler(self):
+        """ Handles event calls for the closing of the application.
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        None
+        """
+
         if self.save_name.get() == "untitled.json*":
             save_changes = tk.messagebox.askyesnocancel("Save Encoder", "Do you want to save the encoder before exiting? Loosing your encoder might mean you will not be able to extract any compressed file.")
 
@@ -341,7 +455,20 @@ class EncoderGUI():
         else:
             self.root.destroy()
 
-    def browse_files_handler(self, filetypes:list):
+    def browse_files_handler(self, filetypes:list) -> Optional[str]:
+        """ Handles event calls for the browsing of files.
+
+        Parameters
+        ----------
+        filetypes : list
+            List of file types to be browsed.
+
+        Returns
+        -------
+        Optional[str]
+            The path to the selected file.
+        """
+
         try:
             return FileOperator.browse_files(
                 filetypes=filetypes, 
@@ -356,7 +483,22 @@ class EncoderGUI():
             logging.error(msg=str(e), exc_info=True)
     
     def browse_saves_handler(self, filetypes:list, defaultextension:str, defaultname:str):
+        """ Handles event calls for the browsing and creation of save files.
 
+        Parameters
+        ----------
+        filetypes : list
+            List of file types to be browsed.
+        defaultextension : str
+            The default file extension to be used.
+        defaultname : str
+            The default file name to be used.
+        
+        Returns
+        -------
+        Optional[str]
+            The path to the selected file.
+        """
         try:
             return FileOperator.browse_save_files(
                 filetypes=filetypes, 
@@ -372,41 +514,84 @@ class EncoderGUI():
             messagebox.showerror(title="Error", message="An error occured while retrieving the selected file. Please see log files for details.")
             logging.error(msg=str(e), exc_info=True)
     
-    def new_encoder_handler(self):
+    def new_encoder_handler(self) -> Optional[str]:
+        """ Handles event calls for the creation of a new encoder.
+        
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        Optional[str]
+            The name of the new encoding file.
+        """
         try:
             save = self.file_manager.new_encoder()
             
             if save is not None:
-                self.save_name.set(save)
+                return save
         
         except Exception as e:
             messagebox.showerror(title="Error", message="An error occured while creating a new encoder. Please see log files for details.")
             logging.error(msg=str(e), exc_info=True)
     
-    def open_encoder_handler(self):
+    def open_encoder_handler(self) -> Optional[str]:
+        """ Handles event calls for the opening of an encoder.
+        
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        Optional[str]
+            The name of the opened encoding file.
+        """
+
         try:
             save = self.file_manager.open_encoder()
 
             if save is not None:
-                self.save_name.set(save)
+                return save
         
         except Exception as e:
             messagebox.showerror(title="Error", message="An error occurred while opening an encoder. Please see log files for details.")
             logging.error(msg=str(e), exc_info=True)
 
-    def save_encoder_handler(self):
+    def save_encoder_handler(self) -> Optional[str]:
+        """ Handles event calls for the saving of an encoder.
+        
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        Optional[str]
+            The name of the saved encoding file.
+        """
         try:
             save = self.file_manager.save_encoder()
 
             if save is not None:
-                self.save_name.set(save)
+                return save
 
         except Exception as e:
             messagebox.showerror(title="Error", message="An error occurred while saving an encoder. Please see log files for details.")
             logging.error(msg=str(e), exc_info=True)
     
-    def compress_handler(self):
-    
+    def compress_handler(self) -> None:
+        """ Handles event calls for the compression of a file.
+        
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        None
+        """
         try:
             self.file_manager.compress(self.compression_file_path.get(), self.compression_target_path.get())
             self.reset_menu()
@@ -422,7 +607,17 @@ class EncoderGUI():
             messagebox.showerror(title="Error", message="An error occured during compression. Please see log files for details.")
             logging.error(msg=str(e), exc_info=True)
     
-    def extract_handler(self):
+    def extract_handler(self) -> None:
+        """ Handles event calls for the extraction of a file.
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        None
+        """
 
         try:
             self.file_manager.extract(self.extraction_file_path.get(), self.extraction_target_path.get())
@@ -440,8 +635,13 @@ class EncoderGUI():
             messagebox.showerror(title="Error", message="An error occured during extraction. Please see log files for details.")
             logging.error(msg=str(e), exc_info=True)
 
-    def display_character_info_handler(self, event) -> None:
+    def display_character_info_handler(self, event:tk.Event) -> None:
         """ Updates the character information frame of the statistics window when selecting a specific character.
+
+        Parameters
+        ----------
+        event : tk.Event
+            The event that triggered the function.
 
         Returns
         -------
@@ -469,7 +669,11 @@ class EncoderGUI():
             logging.error(msg=str(e), exc_info=True)
 
     def reset_menu(self) -> None:
-        """ Resets all entries in all menus to blank.  
+        """ Resets entries to all menus to none.  
+
+        Parameters
+        ----------
+        None
 
         Returns
         -------
