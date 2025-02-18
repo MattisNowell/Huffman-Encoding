@@ -1,0 +1,31 @@
+Usage:
+
+This application performs Huffman encoding and decoding.
+
+Encoding:
+1. Select a file to compress.
+2. Choose an output file name.
+3. Click 'Encode' to compress the file using Huffman encoding.
+
+Decoding:
+1. Select a Huffman-encoded file to decompress.
+2. Choose an output file name.
+3. Click 'Decode' to extract the original file.
+
+Creating/Opening Huffman Encoder:
+To ensure proper compression and extraction, the same Huffman encoder must be used. You can either:
+1. Create a new encoder when compressing a file. This encoder will be embedded in the compressed file.
+2. Open an existing encoder file. This is necessary when decompressing a file that was compressed with a specific encoder. Make sure the correct encoder file is selected.
+
+Help:
+For more information about Huffman encoding, see the 'About' section.
+
+About Huffman Encoding:
+
+Huffman encoding is a lossless data compression algorithm that assigns variable-length codes to input characters based on their frequency. 
+More frequent characters receive shorter codes, while less frequent characters receive longer codes. This leads to an overall reduction in the size of the encoded data.
+
+Importance of Selecting Encoders:
+
+Choosing the right encoder is crucial for efficient compression and extraction. A well-designed encoder optimizes the Huffman tree structure, resulting in a higher compression ratio. 
+The encoder should also be reliable and ensure accurate decoding to prevent data loss or corruption.
